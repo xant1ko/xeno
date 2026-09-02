@@ -2,6 +2,8 @@
 SHELL := /usr/bin/env bash
 
 WEB_DIR=web
+DEV_TOOLS_DIR=dev-tools
+MONGO_SCRIPT=$(DEV_TOOLS_DIR)/mongo.sh
 
 # --- web ---
 
@@ -20,3 +22,21 @@ web_check:
 .PHONY: web_check_fix
 web_check_fix:
 	cd $(WEB_DIR); npm run check:fix $(ARGS)
+
+# --- dev db ---
+
+.PHONY: dev_db_up
+dev_db_up:
+	./$(MONGO_SCRIPT) up
+
+.PHONY: dev_db_down
+dev_db_down:
+	./$(MONGO_SCRIPT) down
+
+.PHONY: dev_db_logs
+dev_db_logs:
+	./$(MONGO_SCRIPT) logs
+
+.PHONY: dev_db_status
+dev_db_status:
+	./$(MONGO_SCRIPT) status
