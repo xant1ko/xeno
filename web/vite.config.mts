@@ -24,8 +24,8 @@ export default defineConfig({
       inject: {
         data: {
           title: 'xeno',
-          faviconDark: '/favicons/devup/dark.svg',
-          faviconLight: '/favicons/devup/light.svg',
+          faviconDark: '/favicons/xnt-logo-white.svg',
+          faviconLight: '/favicons/xnt-logo-black.svg',
           orgName: 'xeno',
         },
       },

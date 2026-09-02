@@ -5,7 +5,6 @@
   >
     <v-list-group
       v-for="group in navigateStore.filteredPages"
-      class="tree-list-group"
       :key="group.id"
       :value="group.id"
     >

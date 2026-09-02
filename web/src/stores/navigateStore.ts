@@ -1,9 +1,7 @@
 import type { RouteLocation } from 'vue-router'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { entityPermissions, type UserRole } from '@/config/permissions'
 import router from '@/router'
-import { useUserStore } from './userStore'
 
 export interface BreadcrumbItem {
   title: string
@@ -15,8 +13,6 @@ export interface NavPage {
   id: string
   title: string
   path: string
-  roles: readonly UserRole[]
-  icon: string
 }
 
 export interface NavGroup {
@@ -41,119 +37,24 @@ export const useNavigateStore = defineStore(
 
     const pages: NavGroup[] = [
       {
-        id: 'education',
-        title: 'Обучение',
-        icon: 'mdi-school-outline',
-        items: [
-          {
-            id: 'directions',
-            title: 'Направления',
-            path: '/directions',
-            roles: entityPermissions.directions.read,
-            icon: 'mdi-arrow-expand-all',
-          },
-          {
-            id: 'courses',
-            title: 'Курсы',
-            path: '/courses',
-            roles: entityPermissions.courses.read,
-            icon: 'mdi-book-multiple',
-          },
-          {
-            id: 'themes',
-            title: 'Темы',
-            path: '/themes',
-            roles: entityPermissions.themes.read,
-            icon: 'mdi-book-open-variant',
-          },
-        ],
-      },
-      {
         id: 'students',
-        title: 'Студенты',
-        icon: 'mdi-account-school-outline',
+        title: 'Финансы',
+        icon: 'mdi-cash',
         items: [
-          {
-            id: 'students',
-            title: 'Студенты',
-            path: '/students',
-            roles: entityPermissions.students.read,
-            icon: 'mdi-school',
-          },
-          {
-            id: 'progress',
-            title: 'Прогресс студентов',
-            path: '/progress',
-            roles: entityPermissions.studentProgress.read,
-            icon: 'mdi-chart-line',
-          },
-          {
-            id: 'counter',
-            title: 'Поступление студентов',
-            path: '/counter',
-            roles: entityPermissions.counter.read,
-            icon: 'mdi-chart-scatter-plot',
-          },
           {
             id: 'potential-students',
-            title: 'Потенциальные студенты',
-            path: '/potential-students',
-            roles: entityPermissions.potentialStudents.read,
-            icon: 'mdi-account-question',
+            title: 'Расписание операций',
+            path: '/operation-schedule',
           },
         ],
-      },
-      {
-        id: 'agent',
-        title: 'Агент',
-        icon: 'mdi-robot-outline',
-        items: [
-          {
-            id: 'agent-chats',
-            title: 'Чаты с агентом',
-            path: '/agent-chats',
-            roles: entityPermissions.agentChats.read,
-            icon: 'mdi-robot',
-          },
-          {
-            id: 'agent-schedules',
-            title: 'Расписания агента',
-            path: '/agent-schedules',
-            roles: entityPermissions.agentSchedules.read,
-            icon: 'mdi-calendar-clock',
-          },
-        ],
-      },
-      {
-        id: 'administration',
-        title: 'Администрирование',
-        icon: 'mdi-cog-outline',
-        items: [
-          {
-            id: 'users',
-            title: 'Пользователи',
-            path: '/users',
-            roles: entityPermissions.users.read,
-            icon: 'mdi-account-multiple',
-          },
-          {
-            id: 'likes',
-            title: 'Типы лайков',
-            path: '/likes',
-            roles: entityPermissions.likes.read,
-            icon: 'mdi-emoticon-outline',
-          },
-        ],
-      },
+      }
     ]
 
     const filteredPages = computed(() =>
       pages
         .map(group => ({
           ...group,
-          items: group.items.filter(page =>
-            page.roles.length === 0 || page.roles.some(role => useUserStore().isHasRole(role)),
-          ),
+          items: group.items,
         }))
         .filter(group => group.items.length > 0),
     )

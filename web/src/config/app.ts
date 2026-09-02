@@ -1,5 +1,3 @@
-import type { OrganizationConfig } from './types'
-
 export const xenoConfig = {
   id: 'xeno',
   name: 'xeno',
@@ -32,12 +30,12 @@ export const xenoConfig = {
   },
   assets: {
     logo: {
-      dark: '/logos/devup.svg',
-      light: '/logos/devup-light.svg',
+      dark: '/favicons/xnt-logo-white.svg',
+      light: '/favicons/xnt-logo-black.svg',
     },
     favicon: {
-      dark: '/favicons/devup/dark.svg',
-      light: '/favicons/devup/light.svg',
+      dark: '/favicons/xnt-logo-white.svg',
+      light: '/favicons/xnt-logo-black.svg',
     },
   },
-} as const satisfies OrganizationConfig
+}

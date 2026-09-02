@@ -5,7 +5,7 @@
     height="30"
   >
     <v-spacer />
-    {{ webVersion }}-{{ apiVersion }}
+    Версия web: {{ webVersion }}
   </v-footer>
 </template>
 
@@ -15,11 +15,4 @@ import appPackageInfo from '@/../package.json'
 import { getAppInfo } from '@/types/generated'
 
 const webVersion = appPackageInfo.version
-const apiVersion = ref('')
-
-onMounted(() => {
-  getAppInfo().then(r => {
-    apiVersion.value = r.data!.back_version
-  })
-})
 </script>

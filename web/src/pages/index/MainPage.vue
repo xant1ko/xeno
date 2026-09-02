@@ -3,10 +3,7 @@
     max-width="1000"
     class="h-100 d-flex flex-column justify-center align-center"
   >
-    <AppLogo height="30" />
-    <h2 class="text-center">
-      xeno {{ currentOrg.name }}
-    </h2>
+    <AppLogo height="60" />
   </v-container>
 </template>
 

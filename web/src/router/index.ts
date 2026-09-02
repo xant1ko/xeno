@@ -17,7 +17,6 @@ declare module 'vue-router' {
   interface RouteMeta {
     /** Маршрут требует авторизации */
     requiresAuth?: boolean
-
   }
 }
 
@@ -50,21 +49,6 @@ const router = createRouter({
           path: '/auth/register-email',
           name: 'Регистрация',
           component: RegEmailPage,
-        },
-        {
-          path: '/auth/registration-confirm',
-          name: 'Подтверждение регистрации',
-          component: RegisterPage,
-        },
-        {
-          path: '/auth/recovery-password',
-          name: 'Восстановление пароля',
-          component: RecoveryPassword,
-        },
-        {
-          path: '/auth/password-recovery-confirm',
-          name: 'Подтверждение восстановления пароля',
-          component: ConfirmPage,
         },
       ],
     },

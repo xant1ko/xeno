@@ -8,7 +8,7 @@
       <div
         @click="goHome" class="d-flex align-center logo-wrapper ml-4"
       >
-        <AppLogo height="20" />
+        <AppLogo height="40" />
       </div>
       <breadcrumbs />
     </template>
