@@ -9,4 +9,7 @@ export class HealthResponseDto {
 
   @ApiProperty({ example: '2026-08-31T15:00:00.000Z', description: 'Время формирования ответа в ISO 8601.' }) // Документируем формат времени.
   timestamp!: string; // Храним время проверки.
+
+  @ApiProperty({ example: 'ok', description: 'Состояние подключения к MongoDB.' }) // Документируем состояние базы.
+  database!: string; // Храним результат проверки MongoDB.
 }

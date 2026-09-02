@@ -2,6 +2,7 @@
 SHELL := /usr/bin/env bash
 
 WEB_DIR=web
+API_DIR=api-v1
 DEV_TOOLS_DIR=dev-tools
 MONGO_SCRIPT=$(DEV_TOOLS_DIR)/mongo.sh
 
@@ -22,6 +23,13 @@ web_check:
 .PHONY: web_check_fix
 web_check_fix:
 	cd $(WEB_DIR); npm run check:fix $(ARGS)
+
+# --- api ---
+
+.PHONY: dev_api_up
+# Устанавливаем зависимости и запускаем API в режиме разработки.
+dev_api_up: dev_db_up
+	cd $(API_DIR); npm i; npm run start:dev $(ARGS)
 
 # --- dev db ---
 
