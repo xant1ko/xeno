@@ -27,7 +27,7 @@ async function bootstrap(): Promise<void> { // Описываем асинхро
     }),
   );
 
-  const port = configService.get<number>('PORT', 3000); // Берём порт из окружения или используем 3000.
+  const port = configService.get<number>('PORT', 8000); // Берём порт из окружения или используем 8000.
   await app.listen(port); // Запускаем сервер на выбранном порту.
 }
 

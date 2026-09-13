@@ -6,8 +6,8 @@
 
 ## Базовые адреса
 
-- API: `http://localhost:3000/api/v1`
-- Swagger UI: `http://localhost:3000/api/v1/docs`
+- API: `http://localhost:8000/api/v1`
+- Swagger UI: `http://localhost:8000/api/v1/docs`
 - Health-check: `GET /api/v1/health`
 
 ## Правило для новых ручек

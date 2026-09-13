@@ -1,31 +1,22 @@
 import { useState } from "react";
 import {
-  AppstoreOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SettingOutlined,
-  UploadOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
   Button,
-  Drawer,
   Dropdown,
   Grid,
   Layout,
-  Menu,
   Space,
   Typography,
 } from "antd";
 import type { MenuProps } from "antd";
-
-const navigationItems: MenuProps["items"] = [
-  { key: "overview", icon: <AppstoreOutlined />, label: "Обзор" },
-  { key: "import", icon: <UploadOutlined />, label: "Импорт операций" },
-  { key: "settings", icon: <SettingOutlined />, label: "Настройки" },
-];
+import { Logo } from "./components/AppLogo";
+import { AppDrawer } from "./components/navigation/AppDrawer";
 
 const accountItems: MenuProps["items"] = [
   { key: "profile", icon: <UserOutlined />, label: "Профиль" },
@@ -33,30 +24,11 @@ const accountItems: MenuProps["items"] = [
   { key: "logout", icon: <LogoutOutlined />, label: "Выйти", danger: true },
 ];
 
-function Logo({ compact = false }: { compact?: boolean }) {
-  return (
-    <div className={`app-logo${compact ? " app-logo--compact" : ""}`}>
-      <span className="app-logo__mark" aria-hidden="true">X</span>
-      {!compact && <span className="app-logo__name">Xeno</span>}
-    </div>
-  );
-}
 
-function Navigation({ onSelect }: { onSelect?: () => void }) {
-  return (
-    <Menu
-      className="app-navigation"
-      mode="inline"
-      theme="dark"
-      defaultSelectedKeys={["overview"]}
-      items={navigationItems}
-      onSelect={onSelect}
-    />
-  );
-}
+
 
 function App() {
-  const { Content, Header, Sider } = Layout;
+  const { Content, Header } = Layout;
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const [collapsed, setCollapsed] = useState(false);
@@ -72,31 +44,7 @@ function App() {
 
   return (
     <Layout className="app-shell">
-      {!isMobile && (
-        <Sider
-          className="app-sider"
-          width={208}
-          collapsedWidth={76}
-          collapsed={collapsed}
-          collapsible
-          trigger={null}
-        >
-          <Logo compact={collapsed} />
-          <Navigation />
-        </Sider>
-      )}
-
-      <Drawer
-        className="app-drawer"
-        placement="left"
-        width={280}
-        open={isMobile && drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        title={<Logo />}
-        styles={{ body: { padding: 0 } }}
-      >
-        <Navigation onSelect={() => setDrawerOpen(false)} />
-      </Drawer>
+      <AppDrawer isMobile={isMobile} collapsed={collapsed} />
 
       <Layout className="app-main">
         <Header className="app-header">
