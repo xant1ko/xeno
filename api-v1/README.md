@@ -24,6 +24,10 @@ http://localhost:8000/api/v1/docs
 curl http://localhost:8000/api/v1/health
 ```
 
+Операции доступны по адресу `http://localhost:8000/api/v1/operations`. Массовая загрузка
+новых операций выполняется через `POST /api/v1/operations/create-many`.
+Загрузка через `POST /api/v1/csv-import` автоматически сохраняет все успешно распарсенные новые операции.
+
 Production-сборка:
 
 ```bash

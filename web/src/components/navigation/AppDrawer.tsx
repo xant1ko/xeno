@@ -9,15 +9,13 @@ const { Sider } = Layout;
 export function AppDrawer({
   isMobile = false,
   collapsed = false,
-
+drawerOpen
 }) {
   return (
     <>
     {!isMobile && (
       <Sider
         className="app-sider"
-        width={208}
-        collapsedWidth={65}
         collapsed={collapsed}
         collapsible
         trigger={null}
@@ -32,11 +30,11 @@ export function AppDrawer({
       placement="left"
       width={280}
       open={isMobile && drawerOpen}
-      onClose={() => setDrawerOpen(false)}
+      // onClose={() => setDrawerOpen(false)}
       title={<Logo />}
       styles={{ body: { padding: 0 } }}
     >
-      <Navigation onSelect={() => setDrawerOpen(false)} />
+      <Navigation  />
     </Drawer>
   </>
   )

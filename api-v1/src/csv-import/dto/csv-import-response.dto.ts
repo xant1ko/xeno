@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'; // Импортируем описание полей для Swagger.
+import { CreateManyOperationsResponseDto } from '../../operations/dto/create-many-response.dto';
 
 export class CsvImportErrorDto {
   @ApiProperty({ example: 4, description: 'Номер строки CSV вместе с заголовком.' }) // Документируем номер строки.
@@ -64,4 +65,7 @@ export class CsvImportResponseDto {
 
   @ApiProperty({ type: [CsvImportErrorDto], description: 'Ошибки отдельных строк.' }) // Документируем ошибки строк.
   errors!: CsvImportErrorDto[]; // Возвращаем ошибки без остановки импорта.
+
+  @ApiProperty({ type: CreateManyOperationsResponseDto, description: 'Результат сохранения корректных операций в MongoDB.' })
+  saved!: CreateManyOperationsResponseDto;
 }

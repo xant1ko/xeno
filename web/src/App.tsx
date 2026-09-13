@@ -15,8 +15,8 @@ import {
   Typography,
 } from "antd";
 import type { MenuProps } from "antd";
-import { Logo } from "./components/AppLogo";
 import { AppDrawer } from "./components/navigation/AppDrawer";
+import { Logo } from "./components/AppLogo";
 
 const accountItems: MenuProps["items"] = [
   { key: "profile", icon: <UserOutlined />, label: "Профиль" },
@@ -44,7 +44,7 @@ function App() {
 
   return (
     <Layout className="app-shell">
-      <AppDrawer isMobile={isMobile} collapsed={collapsed} />
+      <AppDrawer isMobile={isMobile} collapsed={collapsed} drawerOpen={drawerOpen} />
 
       <Layout className="app-main">
         <Header className="app-header">
@@ -58,7 +58,7 @@ function App() {
 
           {isMobile && <Logo />}
 
-          <Dropdown menu={{ items: accountItems }} placement="bottomRight" arrow>
+          <Dropdown menu={{ items: accountItems }} placement="bottomRight" >
             <Button className="account-button" type="text">
               <Space size={10}>
                 <Avatar size={32} icon={<UserOutlined />} />
