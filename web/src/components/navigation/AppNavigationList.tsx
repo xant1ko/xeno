@@ -1,5 +1,12 @@
 import { Menu } from "antd";
-import { navigationItems } from "../../const/navigationItems";
+import { routes } from "../../const/routes";
+import { Link } from "react-router";
+
+const navItems = routes.map((route) => {
+  return {
+    label: <Link to={route.path}>{route.label}</Link>
+  }
+})
 
 export function Navigation({ onSelect }: { onSelect?: () => void }) {
   return (
@@ -8,7 +15,7 @@ export function Navigation({ onSelect }: { onSelect?: () => void }) {
       mode="inline"
       theme="dark"
       defaultSelectedKeys={["overview"]}
-      items={navigationItems}
+      items={navItems}
       onSelect={onSelect}
     />
   );

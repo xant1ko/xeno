@@ -12,20 +12,20 @@ import {
   Grid,
   Layout,
   Space,
-  Typography,
 } from "antd";
 import type { MenuProps } from "antd";
 import { AppDrawer } from "./components/navigation/AppDrawer";
 import { Logo } from "./components/AppLogo";
+import { BrowserRouter } from "react-router";
+import { Routes } from "react-router";
+import { Route } from "react-router";
+import { routes } from "./const/routes";
 
 const accountItems: MenuProps["items"] = [
   { key: "profile", icon: <UserOutlined />, label: "Профиль" },
   { type: "divider" },
   { key: "logout", icon: <LogoutOutlined />, label: "Выйти", danger: true },
 ];
-
-
-
 
 function App() {
   const { Content, Header } = Layout;
@@ -44,21 +44,33 @@ function App() {
 
   return (
     <Layout className="app-shell">
-      <AppDrawer isMobile={isMobile} collapsed={collapsed} drawerOpen={drawerOpen} />
+      <AppDrawer
+        isMobile={isMobile}
+        collapsed={collapsed}
+        drawerOpen={drawerOpen}
+      />
 
       <Layout className="app-main">
         <Header className="app-header">
           <Button
             className="app-navigation-toggle"
             type="text"
-            icon={isMobile || collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            icon={
+              isMobile || collapsed ? (
+                <MenuUnfoldOutlined />
+              ) : (
+                <MenuFoldOutlined />
+              )
+            }
             onClick={toggleNavigation}
-            aria-label={isMobile || collapsed ? "Открыть навигацию" : "Закрыть навигацию"}
+            aria-label={
+              isMobile || collapsed ? "Открыть навигацию" : "Закрыть навигацию"
+            }
           />
 
           {isMobile && <Logo />}
 
-          <Dropdown menu={{ items: accountItems }} placement="bottomRight" >
+          <Dropdown menu={{ items: accountItems }} placement="bottomRight">
             <Button className="account-button" type="text">
               <Space size={10}>
                 <Avatar size={32} icon={<UserOutlined />} />
@@ -72,10 +84,15 @@ function App() {
         </Header>
 
         <Content className="app-content">
-          <div className="content-heading">
-            <Typography.Title level={2}>Обзор</Typography.Title>
-            <Typography.Text type="secondary">Добро пожаловать в Xeno</Typography.Text>
-          </div>
+          <BrowserRouter>
+            <Routes>
+              {routes.map((route) => {
+                return <>
+                  <Route path={route.path} element={route.element} />
+                </>;
+              })}
+            </Routes>
+          </BrowserRouter>
         </Content>
       </Layout>
     </Layout>
