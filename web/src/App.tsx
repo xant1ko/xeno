@@ -43,6 +43,7 @@ function App() {
   };
 
   return (
+          <BrowserRouter>
     <Layout className="app-shell">
       <AppDrawer
         isMobile={isMobile}
@@ -84,18 +85,17 @@ function App() {
         </Header>
 
         <Content className="app-content">
-          <BrowserRouter>
             <Routes>
               {routes.map((route) => {
                 return <>
-                  <Route path={route.path} element={route.element} />
+                  <Route  path={route.path} element={route.element} />
                 </>;
               })}
             </Routes>
-          </BrowserRouter>
         </Content>
       </Layout>
     </Layout>
+          </BrowserRouter>
   );
 }
 

@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
+import { AuthenticatedUser } from '../auth/types/auth.type';
 import { CreateManyOperationsDto } from './dto/create-many-operations.dto';
 import { CreateManyOperationsResponseDto } from './dto/create-many-response.dto';
 import { CreateOperationDto } from './dto/create-operation.dto';
@@ -13,18 +14,19 @@ import { OperationDocument, OperationFields } from './types/operation.type';
 export class OperationsService {
   constructor(private readonly operationsRepository: OperationsRepository) {}
 
-  async create(dto: CreateOperationDto): Promise<OperationResponseDto> {
-    const operation = await this.operationsRepository.create(this.toFields(dto));
+  async create(user: AuthenticatedUser, dto: CreateOperationDto): Promise<OperationResponseDto> {
+    const operation = await this.operationsRepository.create(this.toUserId(user), this.toFields(dto));
     return this.toResponse(operation);
   }
 
-  async createMany(dto: CreateManyOperationsDto): Promise<CreateManyOperationsResponseDto> {
-    const cutoffDate = await this.operationsRepository.findLatestDate();
+  async createMany(user: AuthenticatedUser, dto: CreateManyOperationsDto): Promise<CreateManyOperationsResponseDto> {
+    const userId = this.toUserId(user);
+    const cutoffDate = await this.operationsRepository.findLatestDate(userId);
     const newOperations = dto.operations
       .map(operation => this.toFields(operation))
       .filter(operation => cutoffDate === null || operation.date.getTime() > cutoffDate.getTime())
       .sort((left, right) => left.date.getTime() - right.date.getTime());
-    const created = await this.operationsRepository.createMany(newOperations);
+    const created = await this.operationsRepository.createMany(userId, newOperations);
 
     return {
       received: dto.operations.length,
@@ -35,8 +37,8 @@ export class OperationsService {
     };
   }
 
-  async findAll(query: OperationsQueryDto): Promise<OperationsPageResponseDto> {
-    const result = await this.operationsRepository.findAll(query.page, query.limit);
+  async findAll(user: AuthenticatedUser, query: OperationsQueryDto): Promise<OperationsPageResponseDto> {
+    const result = await this.operationsRepository.findAll(this.toUserId(user), query.page, query.limit);
     return {
       items: result.items.map(operation => this.toResponse(operation)),
       total: result.total,
@@ -45,17 +47,17 @@ export class OperationsService {
     };
   }
 
-  async findOne(id: string): Promise<OperationResponseDto> {
-    const operation = await this.operationsRepository.findById(this.toObjectId(id));
+  async findOne(user: AuthenticatedUser, id: string): Promise<OperationResponseDto> {
+    const operation = await this.operationsRepository.findById(this.toUserId(user), this.toObjectId(id));
     if (!operation) {
       throw new NotFoundException('Операция не найдена');
     }
     return this.toResponse(operation);
   }
 
-  async update(id: string, dto: UpdateOperationDto): Promise<OperationResponseDto> {
+  async update(user: AuthenticatedUser, id: string, dto: UpdateOperationDto): Promise<OperationResponseDto> {
     const { date, ...fields } = dto;
-    const operation = await this.operationsRepository.updateById(this.toObjectId(id), {
+    const operation = await this.operationsRepository.updateById(this.toUserId(user), this.toObjectId(id), {
       ...fields,
       ...(date === undefined ? {} : { date: new Date(date) }),
     });
@@ -65,8 +67,8 @@ export class OperationsService {
     return this.toResponse(operation);
   }
 
-  async remove(id: string): Promise<void> {
-    const deleted = await this.operationsRepository.deleteById(this.toObjectId(id));
+  async remove(user: AuthenticatedUser, id: string): Promise<void> {
+    const deleted = await this.operationsRepository.deleteById(this.toUserId(user), this.toObjectId(id));
     if (!deleted) {
       throw new NotFoundException('Операция не найдена');
     }
@@ -92,6 +94,10 @@ export class OperationsService {
       throw new BadRequestException('Некорректный идентификатор операции');
     }
     return new ObjectId(id);
+  }
+
+  private toUserId(user: AuthenticatedUser): ObjectId { // Преобразуем проверенный JWT-пользователь в MongoDB ObjectId.
+    return new ObjectId(user.id);
   }
 
   private toResponse(operation: OperationDocument): OperationResponseDto {

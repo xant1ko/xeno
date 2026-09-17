@@ -1,4 +1,5 @@
 import { OperationsService } from '../operations/operations.service';
+import { AuthenticatedUser } from '../auth/types/auth.type';
 import { CsvImportController } from './csv-import.controller';
 import { CsvImportService } from './csv-import.service';
 
@@ -41,10 +42,16 @@ describe('CsvImportController', () => {
       originalname: 'operations.csv',
       buffer: Buffer.from('csv'),
     } as Express.Multer.File;
+    const user: AuthenticatedUser = {
+      id: '66e4fa78469290f19f5642b1',
+      login: 'alex',
+      created_at: new Date('2026-09-14T00:00:00.000Z'),
+      updated_at: new Date('2026-09-14T00:00:00.000Z'),
+    };
 
-    const result = await controller.parseCsv(file);
+    const result = await controller.parseCsv(user, file);
 
-    expect(operationsService.createMany).toHaveBeenCalledWith({
+    expect(operationsService.createMany).toHaveBeenCalledWith(user, {
       operations: [{ ...row, date: parsedDate.toISOString() }],
     });
     expect(result.saved).toBe(saved);

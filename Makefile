@@ -26,15 +26,15 @@ web_check_fix:
 
 # --- api ---
 
-.PHONY: dev_api_up
+.PHONY: start_api
 # Устанавливаем зависимости и запускаем API в режиме разработки.
-dev_api_up: dev_db_up
+start_api: start_db
 	cd $(API_DIR); npm i; npm run start:dev $(ARGS)
 
 # --- dev db ---
 
-.PHONY: dev_db_up
-dev_db_up:
+.PHONY: start_db
+start_db:
 	./$(MONGO_SCRIPT) up
 
 .PHONY: dev_db_down

@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -8,7 +9,11 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AuthenticatedUser } from '../auth/types/auth.type';
 import { CreateManyOperationsDto } from './dto/create-many-operations.dto';
 import { CreateManyOperationsResponseDto } from './dto/create-many-response.dto';
 import { CreateOperationDto } from './dto/create-operation.dto';
@@ -18,6 +23,8 @@ import { UpdateOperationDto } from './dto/update-operation.dto';
 import { OperationsService } from './operations.service';
 
 @ApiTags('operations')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('operations')
 export class OperationsController {
   constructor(private readonly operationsService: OperationsService) {}
@@ -26,24 +33,27 @@ export class OperationsController {
   @ApiOperation({ summary: 'Создать операцию' })
   @ApiCreatedResponse({ type: OperationResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректные данные операции.' })
-  create(@Body() dto: CreateOperationDto): Promise<OperationResponseDto> {
-    return this.operationsService.create(dto);
+  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateOperationDto): Promise<OperationResponseDto> {
+    return this.operationsService.create(user, dto);
   }
 
   @Post('create-many')
   @ApiOperation({ summary: 'Создать только операции новее последней сохранённой' })
   @ApiCreatedResponse({ type: CreateManyOperationsResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректный массив операций.' })
-  createMany(@Body() dto: CreateManyOperationsDto): Promise<CreateManyOperationsResponseDto> {
-    return this.operationsService.createMany(dto);
+  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  createMany(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateManyOperationsDto): Promise<CreateManyOperationsResponseDto> {
+    return this.operationsService.createMany(user, dto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Получить список операций' })
   @ApiOkResponse({ type: OperationsPageResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректные параметры выборки.' })
-  findAll(@Query() query: OperationsQueryDto): Promise<OperationsPageResponseDto> {
-    return this.operationsService.findAll(query);
+  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  findAll(@CurrentUser() user: AuthenticatedUser, @Query() query: OperationsQueryDto): Promise<OperationsPageResponseDto> {
+    return this.operationsService.findAll(user, query);
   }
 
   @Get(':id')
@@ -52,8 +62,9 @@ export class OperationsController {
   @ApiOkResponse({ type: OperationResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректный идентификатор.' })
   @ApiNotFoundResponse({ description: 'Операция не найдена.' })
-  findOne(@Param('id') id: string): Promise<OperationResponseDto> {
-    return this.operationsService.findOne(id);
+  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  findOne(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string): Promise<OperationResponseDto> {
+    return this.operationsService.findOne(user, id);
   }
 
   @Patch(':id')
@@ -62,8 +73,9 @@ export class OperationsController {
   @ApiOkResponse({ type: OperationResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректный идентификатор или данные операции.' })
   @ApiNotFoundResponse({ description: 'Операция не найдена.' })
-  update(@Param('id') id: string, @Body() dto: UpdateOperationDto): Promise<OperationResponseDto> {
-    return this.operationsService.update(id, dto);
+  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  update(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: UpdateOperationDto): Promise<OperationResponseDto> {
+    return this.operationsService.update(user, id, dto);
   }
 
   @Delete(':id')
@@ -73,7 +85,8 @@ export class OperationsController {
   @ApiNoContentResponse({ description: 'Операция удалена.' })
   @ApiBadRequestResponse({ description: 'Некорректный идентификатор.' })
   @ApiNotFoundResponse({ description: 'Операция не найдена.' })
-  remove(@Param('id') id: string): Promise<void> {
-    return this.operationsService.remove(id);
+  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  remove(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string): Promise<void> {
+    return this.operationsService.remove(user, id);
   }
 }

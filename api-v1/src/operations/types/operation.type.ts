@@ -15,6 +15,7 @@ export type OperationFields = {
 
 export type OperationDocument = OperationFields & {
   _id: ObjectId;
+  user_id: ObjectId;
   created_at: Date;
   updated_at: Date;
 };

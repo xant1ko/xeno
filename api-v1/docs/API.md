@@ -99,3 +99,16 @@ export class ExamplesController {
 
 `POST /csv-import` после парсинга автоматически передаёт все корректные строки в ту же логику
 `create-many`. Результат записи возвращается в поле `saved`; строки с ошибками в MongoDB не передаются.
+
+## Auth
+
+- `POST /auth/register` принимает `login` и `password`, создаёт пользователя и возвращает access token.
+- `POST /auth/login` принимает `login` и `password`, возвращает access token при корректных учётных данных.
+- `GET /auth/me` требует заголовок `Authorization: Bearer <access_token>` и возвращает текущего пользователя.
+
+JWT подписывается секретом `JWT_SECRET`, а срок действия задаётся `JWT_EXPIRES_IN`.
+
+## Доступ к операциям
+
+Все ручки `operations` и `csv-import` требуют Bearer JWT. Операции изолированы по владельцу:
+поиск, обновление, удаление и массовый импорт учитывают только операции текущего пользователя.

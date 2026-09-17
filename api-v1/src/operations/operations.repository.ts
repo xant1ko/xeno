@@ -12,13 +12,17 @@ export class OperationsRepository implements OnModuleInit {
   }
 
   async onModuleInit(): Promise<void> {
-    await this.collection.createIndex({ date: -1 }, { name: 'operations_date_desc' });
+    await this.collection.createIndex(
+      { user_id: 1, date: -1 },
+      { name: 'operations_user_id_date_desc' },
+    ); // Используем владельца и дату для изолированного импорта и списка операций.
   }
 
-  async create(fields: OperationFields): Promise<OperationDocument> {
+  async create(userId: ObjectId, fields: OperationFields): Promise<OperationDocument> {
     const now = new Date();
     const document: OperationDocument = {
       _id: new ObjectId(),
+      user_id: userId,
       ...fields,
       created_at: now,
       updated_at: now,
@@ -27,7 +31,7 @@ export class OperationsRepository implements OnModuleInit {
     return document;
   }
 
-  async createMany(fieldsList: OperationFields[]): Promise<OperationDocument[]> {
+  async createMany(userId: ObjectId, fieldsList: OperationFields[]): Promise<OperationDocument[]> {
     if (fieldsList.length === 0) {
       return [];
     }
@@ -35,6 +39,7 @@ export class OperationsRepository implements OnModuleInit {
     const now = new Date();
     const documents = fieldsList.map(fields => ({
       _id: new ObjectId(),
+      user_id: userId,
       ...fields,
       created_at: now,
       updated_at: now,
@@ -43,38 +48,38 @@ export class OperationsRepository implements OnModuleInit {
     return documents;
   }
 
-  async findLatestDate(): Promise<Date | null> {
-    const latest = await this.collection.findOne({}, { sort: { date: -1 }, projection: { date: 1 } });
+  async findLatestDate(userId: ObjectId): Promise<Date | null> {
+    const latest = await this.collection.findOne({ user_id: userId }, { sort: { date: -1 }, projection: { date: 1 } });
     return latest?.date ?? null;
   }
 
-  async findAll(page: number, limit: number): Promise<OperationsPage> {
+  async findAll(userId: ObjectId, page: number, limit: number): Promise<OperationsPage> {
     const [items, total] = await Promise.all([
       this.collection
-        .find()
+        .find({ user_id: userId })
         .sort({ date: -1, _id: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .toArray(),
-      this.collection.countDocuments(),
+      this.collection.countDocuments({ user_id: userId }),
     ]);
     return { items, total };
   }
 
-  findById(id: ObjectId): Promise<OperationDocument | null> {
-    return this.collection.findOne({ _id: id });
+  findById(userId: ObjectId, id: ObjectId): Promise<OperationDocument | null> {
+    return this.collection.findOne({ _id: id, user_id: userId });
   }
 
-  async updateById(id: ObjectId, fields: Partial<OperationFields>): Promise<OperationDocument | null> {
+  async updateById(userId: ObjectId, id: ObjectId, fields: Partial<OperationFields>): Promise<OperationDocument | null> {
     return this.collection.findOneAndUpdate(
-      { _id: id },
+      { _id: id, user_id: userId },
       { $set: { ...fields, updated_at: new Date() } },
       { returnDocument: 'after' },
     );
   }
 
-  async deleteById(id: ObjectId): Promise<boolean> {
-    const result = await this.collection.deleteOne({ _id: id });
+  async deleteById(userId: ObjectId, id: ObjectId): Promise<boolean> {
+    const result = await this.collection.deleteOne({ _id: id, user_id: userId });
     return result.deletedCount === 1;
   }
 }

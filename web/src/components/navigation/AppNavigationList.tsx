@@ -4,6 +4,8 @@ import { Link } from "react-router";
 
 const navItems = routes.map((route) => {
   return {
+    key: route.key,
+    icon: route.icon,
     label: <Link to={route.path}>{route.label}</Link>
   }
 })

@@ -28,9 +28,7 @@ drawerOpen
     <Drawer
       className="app-drawer"
       placement="left"
-      width={280}
       open={isMobile && drawerOpen}
-      // onClose={() => setDrawerOpen(false)}
       title={<Logo />}
       styles={{ body: { padding: 0 } }}
     >
