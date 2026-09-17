@@ -1,0 +1,23 @@
+# Development-override: hot reload API и публикация MongoDB/API на хост.
+services:
+  mongodb:
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+
+  api:
+    build:
+      target: development
+    environment:
+      NODE_ENV: development
+    command: npm run start:dev
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      # Исходники доступны Nest watch-процессу без пересборки образа.
+      - ./api-v1:/app
+      # Зависимости хранятся в Docker volume, а не заменяются node_modules хоста.
+      - api-node-modules:/app/node_modules
+
+volumes:
+  api-node-modules:
+    driver: local

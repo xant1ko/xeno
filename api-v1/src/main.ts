@@ -28,7 +28,7 @@ async function bootstrap(): Promise<void> { // Описываем асинхро
   );
 
   const port = configService.get<number>('PORT', 8000); // Берём порт из окружения или используем 8000.
-  await app.listen(port); // Запускаем сервер на выбранном порту.
+  await app.listen(port, '0.0.0.0'); // Принимаем запросы из Docker-сети и с локального хоста.
 }
 
 void bootstrap(); // Запускаем приложение без необработанного Promise.
