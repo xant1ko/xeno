@@ -6,6 +6,56 @@ API_DIR=api-v1
 DEV_TOOLS_DIR=dev-tools
 MONGO_SCRIPT=$(DEV_TOOLS_DIR)/mongo.sh
 
+# Короткие команды для полного Docker-стека. Перед первым запуском скопируйте
+# соответствующий .env.*.example в .env.dev или .env.prod.
+COMPOSE=docker compose
+DEV_COMPOSE=$(COMPOSE) --env-file .env.dev -f compose.yaml -f compose.dev.yaml
+PROD_COMPOSE=$(COMPOSE) --env-file .env.prod -f compose.yaml -f compose.prod.yaml
+
+# --- Docker Compose ---
+
+.PHONY: dev-up dev-down dev-build dev-logs dev-ps
+# Запускаем development-стек с пересборкой образов и выводом логов в консоль.
+dev-up:
+	$(DEV_COMPOSE) up --build
+
+# Останавливаем development-контейнеры, не удаляя volume с данными MongoDB.
+dev-down:
+	$(DEV_COMPOSE) down
+
+# Пересобираем development-образы без запуска контейнеров.
+dev-build:
+	$(DEV_COMPOSE) build
+
+# Открываем поток логов всех сервисов development-стека.
+dev-logs:
+	$(DEV_COMPOSE) logs -f
+
+# Показываем состояние development-контейнеров и healthchecks.
+dev-ps:
+	$(DEV_COMPOSE) ps
+
+.PHONY: prod-up prod-down prod-build prod-logs prod-ps
+# Запускаем production-стек в фоне после пересборки образов.
+prod-up:
+	$(PROD_COMPOSE) up -d --build
+
+# Останавливаем production-контейнеры, сохраняя данные MongoDB.
+prod-down:
+	$(PROD_COMPOSE) down
+
+# Собираем production-образы; используйте после обновления зависимостей или кода.
+prod-build:
+	$(PROD_COMPOSE) build
+
+# Открываем поток логов production-стека.
+prod-logs:
+	$(PROD_COMPOSE) logs -f
+
+# Показываем состояние production-контейнеров и healthchecks.
+prod-ps:
+	$(PROD_COMPOSE) ps
+
 # --- web ---
 
 .PHONY: start_web

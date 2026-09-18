@@ -5,12 +5,18 @@ import { Drawer, Layout } from "antd"
 
 const { Sider } = Layout;
 
+// Состояния навигации приходят из App и используются в desktop- и mobile-вариантах.
+type AppDrawerProps = {
+  isMobile?: boolean;
+  collapsed?: boolean;
+  drawerOpen: boolean;
+};
 
 export function AppDrawer({
   isMobile = false,
   collapsed = false,
-drawerOpen
-}) {
+  drawerOpen,
+}: AppDrawerProps) {
   return (
     <>
     {!isMobile && (
