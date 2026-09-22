@@ -1,6 +1,10 @@
 import { apiClient } from "../client";
 import { useAuthStore } from "../../stores/auth.store";
-import type { AuthResponse, LoginRequest } from "./auth.types";
+import type { AuthResponse, AuthUser, LoginRequest } from "./auth.types";
+
+export const authQueryKeys = {
+  me: ["auth", "me"] as const,
+};
 
 export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
@@ -9,16 +13,21 @@ export const authService = {
       credentials,
     );
 
-    useAuthStore.getState().setSession(response.data);
+    useAuthStore.getState().setUser(response.data.user);
 
     return response.data;
   },
 
-  logout(): void {
-    useAuthStore.getState().clearSession();
+  async logout(): Promise<void> {
+    try {
+      await apiClient.post("/auth/logout");
+    } finally {
+      useAuthStore.getState().clearUser();
+    }
   },
 
-  getAccessToken(): string | null {
-    return useAuthStore.getState().accessToken;
+  async getCurrentUser(): Promise<AuthUser> {
+    const response = await apiClient.get<AuthUser>("/auth/me");
+    return response.data;
   },
 };

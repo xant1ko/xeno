@@ -29,6 +29,10 @@ body {
   margin-bottom: 0;
 }
 
+.auth-card__error {
+  margin-bottom: 24px;
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;
