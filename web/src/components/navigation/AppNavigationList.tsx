@@ -1,5 +1,5 @@
 import { Menu } from "antd";
-import { routes } from "../../const/routes";
+import { routes } from "../../router/routes";
 import { Link } from "react-router";
 
 const navItems = routes.map((route) => {

@@ -76,6 +76,19 @@ a {
   margin-inline: 0;
 }
 
+/* В свёрнутом сайдбаре каждый пункт становится квадратной кнопкой 40 × 40. */
+.app-sider.ant-layout-sider-collapsed .app-navigation {
+  padding-inline: 20px;
+}
+
+.app-sider.ant-layout-sider-collapsed .app-navigation .ant-menu-item {
+  width: 40px;
+  height: 40px;
+  margin-inline: auto;
+  padding-inline: 12px;
+  line-height: 40px;
+}
+
 .app-main {
   min-width: 0;
 }
@@ -129,6 +142,122 @@ a {
   padding: 32px;
 }
 
+.overview-page {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.overview-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 340px;
+  padding: 48px;
+  overflow: hidden;
+  border: 1px solid #30243a;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 85% 20%, rgb(168 85 247 / 18%), transparent 34%),
+    linear-gradient(135deg, #181220, #110d17 68%);
+}
+
+.overview-hero__glow {
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgb(168 85 247 / 12%);
+  filter: blur(20px);
+}
+
+.overview-hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: 670px;
+}
+
+.overview-hero__tag {
+  margin-bottom: 20px;
+  padding: 5px 10px;
+  color: #d8b4fe;
+  background: #291637;
+}
+
+.overview-hero__title.ant-typography {
+  max-width: 620px;
+  margin: 0 0 16px;
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.overview-hero__description.ant-typography {
+  max-width: 620px;
+  margin-bottom: 28px;
+  color: #b9afc2;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.overview-hero__mark {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: 0 0 140px;
+  width: 140px;
+  height: 140px;
+  margin-left: 48px;
+  place-items: center;
+  border: 1px solid rgb(216 180 254 / 35%);
+  border-radius: 38px;
+  color: #fff;
+  background: linear-gradient(145deg, #a855f7, #6d28d9);
+  box-shadow: 0 28px 70px rgb(109 40 217 / 38%);
+  font-size: 64px;
+  font-weight: 800;
+  transform: rotate(6deg);
+}
+
+.overview-features {
+  margin-top: 40px;
+}
+
+.overview-section-heading {
+  margin-bottom: 20px;
+}
+
+.overview-section-heading .ant-typography {
+  margin-top: 0;
+}
+
+.overview-feature-card {
+  height: 100%;
+}
+
+.overview-feature-card .ant-card-body {
+  padding: 24px;
+}
+
+.overview-feature-card .ant-typography {
+  margin-top: 0;
+}
+
+.overview-feature-card__icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 20px;
+  place-items: center;
+  border: 1px solid #4a2a60;
+  border-radius: 12px;
+  color: #c084fc;
+  background: #291637;
+  font-size: 20px;
+}
+
 .content-heading .ant-typography {
   margin: 0;
 }
@@ -160,5 +289,18 @@ a {
 
   .app-content {
     padding: 24px 16px;
+  }
+
+  .overview-hero {
+    min-height: auto;
+    padding: 32px 24px;
+  }
+
+  .overview-hero__mark {
+    display: none;
+  }
+
+  .overview-hero__title.ant-typography {
+    font-size: 38px;
   }
 }
