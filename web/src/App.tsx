@@ -1,46 +1,15 @@
 import { useState } from "react";
-import {
-  LogoutOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import {
-  Avatar,
-  Button,
-  Dropdown,
-  Grid,
-  Layout,
-  Space,
-} from "antd";
-import type { MenuProps } from "antd";
-import { AppDrawer } from "./components/navigation/AppDrawer";
-import { Logo } from "./components/AppLogo";
-import { BrowserRouter } from "react-router";
-import { Routes } from "react-router";
-import { Route } from "react-router";
-import { routes } from "./const/routes";
-
-const accountItems: MenuProps["items"] = [
-  { key: "profile", icon: <UserOutlined />, label: "Профиль" },
-  { type: "divider" },
-  { key: "logout", icon: <LogoutOutlined />, label: "Выйти", danger: true },
-];
+import { Grid,Layout} from "antd";
+import { AppDrawer, AppHeader } from "./components/navigation";
+import { BrowserRouter, Routes, Route, routes } from "./router";
 
 function App() {
-  const { Content, Header } = Layout;
+  const { Content } = Layout;
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const toggleNavigation = () => {
-    if (isMobile) {
-      setDrawerOpen((open) => !open);
-      return;
-    }
-    setCollapsed((value) => !value);
-  };
 
   return (
           <BrowserRouter>
@@ -52,37 +21,7 @@ function App() {
       />
 
       <Layout className="app-main">
-        <Header className="app-header">
-          <Button
-            className="app-navigation-toggle"
-            type="text"
-            icon={
-              isMobile || collapsed ? (
-                <MenuUnfoldOutlined />
-              ) : (
-                <MenuFoldOutlined />
-              )
-            }
-            onClick={toggleNavigation}
-            aria-label={
-              isMobile || collapsed ? "Открыть навигацию" : "Закрыть навигацию"
-            }
-          />
-
-          {isMobile && <Logo />}
-
-          <Dropdown menu={{ items: accountItems }} placement="bottomRight">
-            <Button className="account-button" type="text">
-              <Space size={10}>
-                <Avatar size={32} icon={<UserOutlined />} />
-                <span className="account-button__details">
-                  <span className="account-button__name">Алексей</span>
-                  <span className="account-button__role">Пользователь</span>
-                </span>
-              </Space>
-            </Button>
-          </Dropdown>
-        </Header>
+        <AppHeader/>
 
         <Content className="app-content">
             <Routes>
