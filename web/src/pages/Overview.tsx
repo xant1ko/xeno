@@ -4,7 +4,7 @@ import {
   FileTextOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Col, Row, Space, Tag, Typography } from "antd";
+import { Button, Card, Col, Row, Space, Typography } from "antd";
 import { Link } from "react-router";
 
 const features = [

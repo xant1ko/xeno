@@ -14,6 +14,21 @@ body {
   background: #0a080f;
 }
 
+.auth-page {
+  display: grid;
+  min-height: 100vh;
+  padding: 24px;
+  place-items: center;
+}
+
+.auth-card {
+  width: min(420px, 100%);
+}
+
+.auth-card .ant-typography:last-child {
+  margin-bottom: 0;
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;
@@ -143,8 +158,12 @@ a {
 }
 
 .overview-page {
+    height: 100vh;
   width: min(1180px, 100%);
-  margin: 0 auto;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .overview-hero {
