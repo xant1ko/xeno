@@ -1,40 +1,37 @@
-import { useState } from "react";
-import { Grid,Layout} from "antd";
-import { AppDrawer, AppHeader } from "./components/navigation";
-import { BrowserRouter, Routes, Route, routes } from "./router";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { AppLayout } from "./layouts/AppLayout";
+import { LoginPage } from "./pages/auth/LoginPage";
+import { RequireAuth } from "./router/RequireAuth";
+import { routes } from "./router/routes";
+import { OverView } from "./pages/Overview";
+import { RootGuard } from "./utils/redirectUtils";
+
 
 function App() {
-  const { Content } = Layout;
-  const screens = Grid.useBreakpoint();
-  const isMobile = !screens.md;
-  const [collapsed, setCollapsed] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-
   return (
-          <BrowserRouter>
-    <Layout className="app-shell">
-      <AppDrawer
-        isMobile={isMobile}
-        collapsed={collapsed}
-        drawerOpen={drawerOpen}
-      />
+    <BrowserRouter>
+      <RootGuard/>
+      <Routes>
 
-      <Layout className="app-main">
-        <AppHeader/>
+        <Route
+          path='/overview'
+          element=<OverView />
+        />
+        <Route path="/login" element={<LoginPage />} />
 
-        <Content className="app-content">
-            <Routes>
-              {routes.map((route) => {
-                return <>
-                  <Route  path={route.path} element={route.element} />
-                </>;
-              })}
-            </Routes>
-        </Content>
-      </Layout>
-    </Layout>
-          </BrowserRouter>
+        <Route element={<RequireAuth />}>
+          <Route element={<AppLayout />}>
+            {routes.map((route) => (
+              <Route
+                key={route.key}
+                path={route.path}
+                element={route.element}
+              />
+            ))}
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
