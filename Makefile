@@ -14,7 +14,7 @@ PROD_COMPOSE=$(COMPOSE) --env-file .env.prod -f compose.yaml -f compose.prod.yam
 
 # --- Docker Compose ---
 
-.PHONY: dev-up dev-down dev-build dev-logs dev-ps
+.PHONY: dev-up dev-down dev-build dev-deps dev-rebuild dev-logs dev-ps
 # Запускаем development-стек с пересборкой образов и выводом логов в консоль.
 dev-up:
 	$(DEV_COMPOSE) up --build
@@ -26,6 +26,20 @@ dev-down:
 # Пересобираем development-образы без запуска контейнеров.
 dev-build:
 	$(DEV_COMPOSE) build
+
+# Синхронизируем package-lock.json с именованными node_modules volumes development-стека.
+# Это нужно после npm install: bind mount скрывает node_modules, установленные в новом Docker-образе.
+dev-deps:
+	$(DEV_COMPOSE) stop api web
+	$(DEV_COMPOSE) run --rm --no-deps api npm ci
+	$(DEV_COMPOSE) run --rm --no-deps web npm ci
+	$(DEV_COMPOSE) up -d --force-recreate
+
+# Полностью пересобираем образы без Docker-кеша, затем обновляем node_modules в development-volumes.
+# MongoDB volume не удаляется: данные базы сохраняются, как и при обычном dev-up.
+dev-rebuild:
+	$(DEV_COMPOSE) build --no-cache
+	$(MAKE) dev-deps
 
 # Открываем поток логов всех сервисов development-стека.
 dev-logs:
