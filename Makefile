@@ -14,7 +14,7 @@ PROD_COMPOSE=$(COMPOSE) --env-file .env.prod -f compose.yaml -f compose.prod.yam
 
 # --- Docker Compose ---
 
-.PHONY: dev-up dev-down dev-build dev-deps dev-rebuild dev-logs dev-ps
+.PHONY: dev-up dev-down dev-build dev-deps dev-rebuild dev-logs dev-ps dev-clear-operations
 # Запускаем development-стек с пересборкой образов и выводом логов в консоль.
 dev-up:
 	$(DEV_COMPOSE) up --build
@@ -48,6 +48,10 @@ dev-logs:
 # Показываем состояние development-контейнеров и healthchecks.
 dev-ps:
 	$(DEV_COMPOSE) ps
+
+# Удаляем все записи коллекции operations из development MongoDB, не затрагивая пользователей и саму базу.
+dev-clear-operations:
+	./$(DEV_TOOLS_DIR)/clear-operations.sh
 
 .PHONY: prod-up prod-down prod-build prod-logs prod-ps
 # Запускаем production-стек в фоне после пересборки образов.
