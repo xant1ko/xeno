@@ -1,155 +1,108 @@
 import type { ThemeConfig } from "antd";
+import { colors } from "./theme.colors";
 
 export const theme: ThemeConfig = {
   token: {
-    // ─────────────────────────────
-    // BRAND
-    // ─────────────────────────────
-
-    colorPrimary: "#A855F7",
-    colorInfo: "#A855F7",
-
-    // ─────────────────────────────
-    // BACKGROUND
-    // ─────────────────────────────
-
-    colorBgBase: "#0A080F",
-    colorBgLayout: "#0A080F",
-    colorBgContainer: "#110D17",
-    colorBgElevated: "#181220",
-    colorBgSpotlight: "#21172C",
-
-    // ─────────────────────────────
-    // TEXT
-    // ─────────────────────────────
-
-    colorText: "#F5F0FA",
-    colorTextSecondary: "#B9AFC2",
-    colorTextTertiary: "#82758D",
-    colorTextQuaternary: "#5D5266",
-
-    // ─────────────────────────────
-    // BORDER
-    // ─────────────────────────────
-
-    colorBorder: "#30243A",
-    colorBorderSecondary: "#211A28",
-
-    // ─────────────────────────────
-    // STATUS
-    // ─────────────────────────────
-
-    colorSuccess: "#4ADE80",
-    colorWarning: "#FACC15",
-    colorError: "#F43F5E",
-
-    // ─────────────────────────────
-    // SIZING
-    // ─────────────────────────────
-
+    colorPrimary: colors.primary,
+    colorInfo: colors.primary,
+    colorBgBase: colors.backgroundBase,
+    colorBgLayout: colors.backgroundBase,
+    colorBgContainer: colors.surface,
+    colorBgElevated: colors.backgroundElevated,
+    colorBgSpotlight: colors.backgroundSpotlight,
+    colorText: colors.textPrimary,
+    colorTextSecondary: colors.textSecondary,
+    colorTextTertiary: colors.textTertiary,
+    colorTextQuaternary: colors.textQuaternary,
+    colorBorder: colors.borderDefault,
+    colorBorderSecondary: colors.borderSubtle,
+    colorSuccess: colors.success,
+    colorWarning: colors.warning,
+    colorError: colors.error,
     borderRadius: 8,
     borderRadiusSM: 6,
     borderRadiusLG: 12,
-
     controlHeight: 38,
     controlHeightSM: 30,
     controlHeightLG: 44,
-
     fontSize: 14,
   },
-
   components: {
     Button: {
-      colorPrimary: "#A855F7",
-      colorPrimaryHover: "#C084FC",
-      colorPrimaryActive: "#9333EA",
-      colorPrimaryBg: "#21132E",
-      colorPrimaryBgHover: "#2B183B",
+      colorPrimary: colors.primary,
+      colorPrimaryHover: colors.primaryHover,
+      colorPrimaryActive: colors.primaryActive,
+      colorPrimaryBg: colors.backgroundPrimary,
+      colorPrimaryBgHover: colors.backgroundPrimaryHover,
       borderRadius: 8,
     },
     Input: {
-      colorBgContainer: "#110D17",
-      colorBorder: "#30243A",
-      hoverBorderColor: "#8B5CF6",
-      activeBorderColor: "#A855F7",
-      activeShadow: "0 0 0 2px rgba(168, 85, 247, 0.15)",
+      colorBgContainer: colors.surface,
+      colorBorder: colors.borderDefault,
+      hoverBorderColor: colors.primaryFocus,
+      activeBorderColor: colors.primary,
+      activeShadow: colors.primaryFocusShadow,
     },
     Select: {
-      colorBgContainer: "#110D17",
-      colorBorder: "#30243A",
-      optionSelectedBg: "#291637",
-      optionActiveBg: "#21132E",
-      optionSelectedColor: "#D8B4FE",
-      hoverBorderColor: "#8B5CF6",
-      activeBorderColor: "#A855F7",
+      colorBgContainer: colors.surface,
+      colorBorder: colors.borderDefault,
+      optionSelectedBg: colors.backgroundActive,
+      optionActiveBg: colors.backgroundPrimary,
+      optionSelectedColor: colors.textAccent,
+      hoverBorderColor: colors.primaryFocus,
+      activeBorderColor: colors.primary,
     },
     Table: {
-      colorBgContainer: "#110D17",
-      headerBg: "#181220",
-      headerColor: "#F5F0FA",
-      rowHoverBg: "#1B1424",
-      borderColor: "#30243A",
-      headerSplitColor: "#30243A",
+      colorBgContainer: colors.surface,
+      headerBg: colors.backgroundElevated,
+      headerColor: colors.textPrimary,
+      rowHoverBg: colors.backgroundHover,
+      borderColor: colors.borderDefault,
+      headerSplitColor: colors.borderDefault,
     },
     Card: {
-      colorBgContainer: "#110D17",
-      colorBorderSecondary: "#30243A",
+      colorBgContainer: colors.surface,
+      colorBorderSecondary: colors.borderDefault,
       borderRadiusLG: 12,
     },
     Modal: {
-      contentBg: "#110D17",
-      headerBg: "#110D17",
-      footerBg: "#110D17",
-      titleColor: "#F5F0FA",
+      contentBg: colors.surface,
+      headerBg: colors.surface,
+      footerBg: colors.surface,
+      titleColor: colors.textPrimary,
     },
     Menu: {
       itemBg: "transparent",
-      itemHoverBg: "#181220",
-      itemSelectedBg: "#291637",
-      itemSelectedColor: "#C084FC",
-      itemColor: "#B9AFC2",
-      itemHoverColor: "#F5F0FA",
+      itemHoverBg: colors.backgroundElevated,
+      itemSelectedBg: colors.backgroundActive,
+      itemSelectedColor: colors.primaryHover,
+      itemColor: colors.textSecondary,
+      itemHoverColor: colors.textPrimary,
       darkItemBg: "transparent",
-      darkSubMenuItemBg: "#110D17",
-      darkItemSelectedBg: "#291637",
-      darkItemSelectedColor: "#C084FC",
-      darkItemColor: "#B9AFC2",
-      darkItemHoverColor: "#F5F0FA",
+      darkSubMenuItemBg: colors.surface,
+      darkItemSelectedBg: colors.backgroundActive,
+      darkItemSelectedColor: colors.primaryHover,
+      darkItemColor: colors.textSecondary,
+      darkItemHoverColor: colors.textPrimary,
     },
     Tabs: {
-      itemColor: "#82758D",
-      itemHoverColor: "#C084FC",
-      itemSelectedColor: "#C084FC",
-      inkBarColor: "#A855F7",
+      itemColor: colors.textTertiary,
+      itemHoverColor: colors.primaryHover,
+      itemSelectedColor: colors.primaryHover,
+      inkBarColor: colors.primary,
     },
-    Tag: {
-      defaultBg: "#21182C",
-      defaultColor: "#C084FC",
-    },
-    Checkbox: {
-      colorPrimary: "#A855F7",
-      colorPrimaryHover: "#C084FC",
-    },
-    Radio: {
-      colorPrimary: "#A855F7",
-      colorPrimaryHover: "#C084FC",
-    },
+    Tag: { defaultBg: colors.backgroundTag, defaultColor: colors.primaryHover },
+    Checkbox: { colorPrimary: colors.primary, colorPrimaryHover: colors.primaryHover },
+    Radio: { colorPrimary: colors.primary, colorPrimaryHover: colors.primaryHover },
     Layout: {
-      colorPrimary: "#A855F7",
-      colorPrimaryHover: "#C084FC",
-      bodyBg: "#0A080F",
-      headerBg: "#110D17",
-      footerBg: "#0A080F",
-      siderBg: "#0A080F",
+      colorPrimary: colors.primary,
+      colorPrimaryHover: colors.primaryHover,
+      bodyBg: colors.backgroundBase,
+      headerBg: colors.surface,
+      footerBg: colors.backgroundBase,
+      siderBg: colors.backgroundBase,
     },
-    Switch: {
-      colorPrimary: "#A855F7",
-      colorPrimaryHover: "#C084FC",
-    },
-
-    Pagination: {
-      itemActiveBg: "#291637",
-      itemActiveColor: "#C084FC",
-    },
+    Switch: { colorPrimary: colors.primary, colorPrimaryHover: colors.primaryHover },
+    Pagination: { itemActiveBg: colors.backgroundActive, itemActiveColor: colors.primaryHover },
   },
 };

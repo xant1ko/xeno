@@ -1,3 +1,5 @@
 # Локальные Compose-переменные могут содержать пароли MongoDB и JWT-секреты.
 .env.dev
 .env.prod
+
+AGENTS.md

@@ -1,4 +1,5 @@
-import { Alert, Table, Typography } from "antd";
+import { FileAddOutlined } from "@ant-design/icons";
+import { Alert, Button, Table, Typography } from "antd";
 import type { TableColumnsType } from "antd";
 import type { Operation } from "../../types";
 import { useOperationsQuery } from "../../queries/useOperationsQuery";
@@ -53,18 +54,42 @@ export function OperationsView() {
     );
   }
 
-  return (
-    <section>
-      <Typography.Title level={1}>Операции</Typography.Title>
+  const items = operations.data?.items ?? [];
+  const hasNoOperations = operations.isSuccess && items.length === 0;
 
-      <Table<Operation>
-        rowKey="id"
-        columns={columns}
-        dataSource={operations.data?.items}
-        loading={operations.isPending}
-        pagination={false}
-        scroll={{ x: true }}
-      />
+  return (
+    <section className="operations-view">
+      {hasNoOperations ? (
+        <div className="operations-empty">
+          <div className="operations-empty__icon " aria-hidden="true">
+            <FileAddOutlined />
+          </div>
+
+          <Typography.Title level={2}>
+            Начните работу прямо сейчас
+          </Typography.Title>
+          <Typography.Paragraph type="secondary">
+            Добавьте первые операции, чтобы увидеть движение денег, категории и
+            историю расходов в одном месте.
+          </Typography.Paragraph>
+
+          <Button type="primary" size="large" disabled >
+            Импортировать CSV
+          </Button>
+          <Typography.Text className="operations-empty__hint" type="secondary">
+            Импорт появится в ближайшем обновлении
+          </Typography.Text>
+        </div>
+      ) : (
+        <Table<Operation>
+          rowKey="id"
+          columns={columns}
+          dataSource={items}
+          loading={operations.isPending}
+          pagination={false}
+          scroll={{ x: true }}
+        />
+      )}
     </section>
   );
 }

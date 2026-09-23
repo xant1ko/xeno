@@ -72,7 +72,7 @@ export function OverView() {
         <Row gutter={[16, 16]}>
           {features.map((feature) => (
             <Col xs={24} md={8} key={feature.title}>
-              <Card className="overview-feature-card" bordered>
+              <Card className="overview-feature-card hover-lift" bordered>
                 <div className="overview-feature-card__icon">{feature.icon}</div>
                 <Typography.Title level={4}>{feature.title}</Typography.Title>
                 <Typography.Paragraph type="secondary">
