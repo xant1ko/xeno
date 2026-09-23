@@ -1,6 +1,6 @@
 import { BadRequestException, Controller, MaxFileSizeValidator, ParseFilePipe, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'; // Импортируем HTTP-декораторы и проверку файла.
 import { FileInterceptor } from '@nestjs/platform-express'; // Подключаем обработку multipart-файлов через Multer.
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger'; // Импортируем Swagger-декораторы.
+import { ApiBody, ApiConsumes, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger'; // Импортируем Swagger-декораторы.
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/types/auth.type';
@@ -10,7 +10,7 @@ import { CsvImportResult } from './types/csv-row.type'; // Подключаем 
 import { CsvImportService } from './csv-import.service'; // Подключаем сервис парсинга CSV.
 
 @ApiTags('csv-import') // Объединяем endpoint импорта в Swagger-раздел.
-@ApiBearerAuth()
+@ApiCookieAuth('xeno_access_token')
 @UseGuards(JwtAuthGuard)
 @Controller('csv-import') // Формируем маршрут /api/v1/csv-import.
 export class CsvImportController {
@@ -35,7 +35,7 @@ export class CsvImportController {
   @ApiResponse({ status: 201, type: CsvImportResponseDto, description: 'CSV преобразован, новые операции сохранены.' }) // Описываем успешный ответ.
   @ApiResponse({ status: 400, description: 'Файл отсутствует или имеет некорректный CSV-формат.' }) // Описываем ошибки валидации.
   @ApiResponse({ status: 413, description: 'Файл превышает ограничение размера.' }) // Документируем ограничение размера.
-  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  @ApiUnauthorizedResponse({ description: 'Cookie JWT отсутствует, повреждён или просрочен.' })
   async parseCsv(
     @CurrentUser() user: AuthenticatedUser,
     @UploadedFile(new ParseFilePipe({

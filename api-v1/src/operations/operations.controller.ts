@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
+  ApiCookieAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -23,7 +23,7 @@ import { UpdateOperationDto } from './dto/update-operation.dto';
 import { OperationsService } from './operations.service';
 
 @ApiTags('operations')
-@ApiBearerAuth()
+@ApiCookieAuth('xeno_access_token')
 @UseGuards(JwtAuthGuard)
 @Controller('operations')
 export class OperationsController {
@@ -33,7 +33,7 @@ export class OperationsController {
   @ApiOperation({ summary: 'Создать операцию' })
   @ApiCreatedResponse({ type: OperationResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректные данные операции.' })
-  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  @ApiUnauthorizedResponse({ description: 'Cookie JWT отсутствует, повреждён или просрочен.' })
   create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateOperationDto): Promise<OperationResponseDto> {
     return this.operationsService.create(user, dto);
   }
@@ -42,7 +42,7 @@ export class OperationsController {
   @ApiOperation({ summary: 'Создать только операции новее последней сохранённой' })
   @ApiCreatedResponse({ type: CreateManyOperationsResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректный массив операций.' })
-  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  @ApiUnauthorizedResponse({ description: 'Cookie JWT отсутствует, повреждён или просрочен.' })
   createMany(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateManyOperationsDto): Promise<CreateManyOperationsResponseDto> {
     return this.operationsService.createMany(user, dto);
   }
@@ -51,7 +51,7 @@ export class OperationsController {
   @ApiOperation({ summary: 'Получить список операций' })
   @ApiOkResponse({ type: OperationsPageResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректные параметры выборки.' })
-  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  @ApiUnauthorizedResponse({ description: 'Cookie JWT отсутствует, повреждён или просрочен.' })
   findAll(@CurrentUser() user: AuthenticatedUser, @Query() query: OperationsQueryDto): Promise<OperationsPageResponseDto> {
     return this.operationsService.findAll(user, query);
   }
@@ -62,7 +62,7 @@ export class OperationsController {
   @ApiOkResponse({ type: OperationResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректный идентификатор.' })
   @ApiNotFoundResponse({ description: 'Операция не найдена.' })
-  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  @ApiUnauthorizedResponse({ description: 'Cookie JWT отсутствует, повреждён или просрочен.' })
   findOne(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string): Promise<OperationResponseDto> {
     return this.operationsService.findOne(user, id);
   }
@@ -73,7 +73,7 @@ export class OperationsController {
   @ApiOkResponse({ type: OperationResponseDto })
   @ApiBadRequestResponse({ description: 'Некорректный идентификатор или данные операции.' })
   @ApiNotFoundResponse({ description: 'Операция не найдена.' })
-  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  @ApiUnauthorizedResponse({ description: 'Cookie JWT отсутствует, повреждён или просрочен.' })
   update(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: UpdateOperationDto): Promise<OperationResponseDto> {
     return this.operationsService.update(user, id, dto);
   }
@@ -85,7 +85,7 @@ export class OperationsController {
   @ApiNoContentResponse({ description: 'Операция удалена.' })
   @ApiBadRequestResponse({ description: 'Некорректный идентификатор.' })
   @ApiNotFoundResponse({ description: 'Операция не найдена.' })
-  @ApiUnauthorizedResponse({ description: 'JWT отсутствует, повреждён или просрочен.' })
+  @ApiUnauthorizedResponse({ description: 'Cookie JWT отсутствует, повреждён или просрочен.' })
   remove(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string): Promise<void> {
     return this.operationsService.remove(user, id);
   }

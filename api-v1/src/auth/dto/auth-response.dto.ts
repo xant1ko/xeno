@@ -15,9 +15,7 @@ export class AuthUserResponseDto {
 }
 
 export class AuthResponseDto {
-  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
-  access_token!: string;
-
+  // JWT передаётся только в httpOnly-cookie через заголовок Set-Cookie, а не в JSON.
   @ApiProperty({ type: AuthUserResponseDto })
   user!: AuthUserResponseDto;
 }

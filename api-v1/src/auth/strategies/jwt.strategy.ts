@@ -5,6 +5,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
 import { AuthenticatedUser, JwtPayload } from '../types/auth.type';
 
+const accessTokenCookieName = 'xeno_access_token'; // Должно совпадать с именем cookie, выставляемым AuthController.
+
 @Injectable() // Регистрируем JWT strategy в Passport.
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -12,7 +14,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly usersService: UsersService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Принимаем только заголовок Authorization: Bearer <token>.
+      // Cookie-parser заполняет request.cookies до вызова Passport strategy.
+      // Не читаем Authorization, чтобы браузерный клиент не хранил JWT в JavaScript.
+      jwtFromRequest: request => request?.cookies?.[accessTokenCookieName] ?? null,
       ignoreExpiration: false, // Passport отклоняет просроченные токены до вызова validate.
       secretOrKey: configService.getOrThrow<string>('JWT_SECRET'), // Не допускаем запуска с отсутствующим секретом.
     });
