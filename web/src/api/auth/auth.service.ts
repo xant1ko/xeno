@@ -1,6 +1,6 @@
 import { apiClient } from "../client";
 import { useAuthStore } from "../../stores/auth.store";
-import type { AuthResponse, AuthUser, LoginRequest } from "./auth.types";
+import type { AuthResponse, AuthUser, LoginRequest } from "../../types";
 
 export const authQueryKeys = {
   me: ["auth", "me"] as const,

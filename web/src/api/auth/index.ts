@@ -1,2 +1,2 @@
 export { authQueryKeys, authService } from "./auth.service";
-export type { AuthResponse, AuthUser, LoginRequest } from "./auth.types";
+export type { AuthResponse, AuthUser, LoginRequest } from "../../types";
