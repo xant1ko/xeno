@@ -1,6 +1,4 @@
-import {
-  SwapOutlined,
-} from "@ant-design/icons";
+import { SwapOutlined } from "@ant-design/icons";
 
 import { OperationsView } from "../pages/operations/OperationsView";
 
