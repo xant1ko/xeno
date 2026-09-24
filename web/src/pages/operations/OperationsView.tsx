@@ -1,4 +1,4 @@
-import { FileAddOutlined } from "@ant-design/icons";
+import { FileAddOutlined, UploadOutlined } from "@ant-design/icons";
 import { Alert, Button, Table, Typography } from "antd";
 import type { TableColumnsType } from "antd";
 import { useState } from "react";
@@ -85,6 +85,17 @@ export function OperationsView() {
           </Button>
         </div>
       ) : (
+        <div>
+          <div className="operations-view__toolbar">
+            <Typography.Title level={1}>Операции</Typography.Title>
+            <Button
+              type="primary"
+              icon={<UploadOutlined />}
+              onClick={() => setIsImportModalOpen(true)}
+            >
+              Импортировать CSV
+            </Button>
+          </div>
         <Table<Operation>
           rowKey="id"
           columns={columns}
@@ -93,6 +104,7 @@ export function OperationsView() {
           pagination={false}
           scroll={{ x: true }}
         />
+        </div>
       )}
 
       <ImportOperationsModal

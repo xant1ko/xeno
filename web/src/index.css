@@ -191,13 +191,25 @@ a {
   margin-top: 0;
 }
 
+.operations-view__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.operations-view__toolbar .ant-typography {
+  margin: 0;
+}
+
 .operations-empty {
   display: flex;
   align-items: center;
   flex-direction: column;
   max-width: 680px;
   min-height: 420px;
-  margin: 24px auto 0;
+  margin: 0 auto;
   padding: 56px 32px;
   text-align: center;
   border: 1px solid var(--color-border-accent);
@@ -251,6 +263,17 @@ a {
 
 .operations-import-dragger .ant-upload-drag-icon .anticon {
   color: var(--color-primary-hover);
+}
+
+.operations-import-alert {
+  margin-bottom: 16px;
+}
+
+.operations-import-errors {
+  margin: -8px 0 16px;
+  padding-left: 20px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
 }
 
 .overview-page {
@@ -623,6 +646,15 @@ a {
 
   .app-content {
     padding: 24px 16px;
+  }
+
+  .operations-view__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .operations-view__toolbar .ant-btn {
+    align-self: flex-start;
   }
 
   .operations-empty {
