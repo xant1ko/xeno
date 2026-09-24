@@ -1,8 +1,10 @@
 import { FileAddOutlined } from "@ant-design/icons";
 import { Alert, Button, Table, Typography } from "antd";
 import type { TableColumnsType } from "antd";
+import { useState } from "react";
 import type { Operation } from "../../types";
 import { useOperationsQuery } from "../../queries/useOperationsQuery";
+import { ImportOperationsModal } from "./components/ImportOperationsModal";
 
 const columns: TableColumnsType<Operation> = [
   {
@@ -42,6 +44,7 @@ const columns: TableColumnsType<Operation> = [
 
 export function OperationsView() {
   const operations = useOperationsQuery({ page: 1, limit: 50 });
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   if (operations.isError) {
     return (
@@ -73,12 +76,13 @@ export function OperationsView() {
             историю расходов в одном месте.
           </Typography.Paragraph>
 
-          <Button type="primary" size="large" disabled >
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => setIsImportModalOpen(true)}
+          >
             Импортировать CSV
           </Button>
-          <Typography.Text className="operations-empty__hint" type="secondary">
-            Импорт появится в ближайшем обновлении
-          </Typography.Text>
         </div>
       ) : (
         <Table<Operation>
@@ -90,6 +94,11 @@ export function OperationsView() {
           scroll={{ x: true }}
         />
       )}
+
+      <ImportOperationsModal
+        open={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+      />
     </section>
   );
 }

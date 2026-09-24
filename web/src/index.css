@@ -237,6 +237,22 @@ a {
   font-size: 12px;
 }
 
+.operations-import-dragger.ant-upload-wrapper .ant-upload-drag {
+  padding: 28px 20px;
+  border-color: var(--color-border-accent);
+  background: var(--color-background-elevated);
+}
+
+.operations-import-dragger.ant-upload-wrapper .ant-upload-drag:hover,
+.operations-import-dragger.ant-upload-wrapper .ant-upload-drag-hover {
+  border-color: var(--color-primary-hover);
+  background: var(--color-background-active);
+}
+
+.operations-import-dragger .ant-upload-drag-icon .anticon {
+  color: var(--color-primary-hover);
+}
+
 .overview-page {
   width: min(1120px, 100%);
   margin: 32px auto 0;
