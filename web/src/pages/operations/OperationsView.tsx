@@ -2,6 +2,7 @@ import { FileAddOutlined, UploadOutlined } from "@ant-design/icons";
 import { Alert, Button, Table, Typography } from "antd";
 import type { TableColumnsType } from "antd";
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import type { Operation } from "../../types";
 import { useOperationsQuery } from "../../queries/useOperationsQuery";
 import { ImportOperationsModal } from "./components/ImportOperationsModal";
@@ -42,20 +43,49 @@ const columns: TableColumnsType<Operation> = [
   },
 ];
 
+const defaultPage = 1;
+const defaultPageSize = 50;
+const pageSizeOptions = [10, 25, 50, 100];
+
+function readPositiveInteger(value: string | null, fallback: number): number {
+  const parsedValue = Number(value);
+
+  // Некорректный URL не должен ломать таблицу: используем безопасное значение по умолчанию.
+  return Number.isInteger(parsedValue) && parsedValue > 0
+    ? parsedValue
+    : fallback;
+}
+
 export function OperationsView() {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(50);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const page = readPositiveInteger(searchParams.get("page"), defaultPage);
+  const pageSize = readPositiveInteger(
+    searchParams.get("limit"),
+    defaultPageSize,
+  );
   const operations = useOperationsQuery({ page, limit: pageSize });
 
   const handlePageChange = (nextPage: number, nextPageSize: number) => {
-    // При смене размера страницы начинаем с начала, иначе пользователь может попасть на пустую страницу.
-    if (nextPageSize !== pageSize) {
-      setPageSize(nextPageSize);
-      setPage(1);
-      return;
-    }
-    setPage(nextPage);
+    setSearchParams((currentSearchParams) => {
+      // Клонируем текущие параметры, чтобы будущие фильтры не пропадали при смене страницы.
+      const nextSearchParams = new URLSearchParams(currentSearchParams);
+      const isPageSizeChanged = nextPageSize !== pageSize;
+
+      // При смене размера страницы начинаем с начала, иначе пользователь может попасть на пустую страницу.
+      nextSearchParams.set("page", String(isPageSizeChanged ? defaultPage : nextPage));
+      nextSearchParams.set("limit", String(nextPageSize));
+
+      return nextSearchParams;
+    });
+  };
+
+  const resetToFirstPage = () => {
+    setSearchParams((currentSearchParams) => {
+      const nextSearchParams = new URLSearchParams(currentSearchParams);
+      nextSearchParams.set("page", String(defaultPage));
+      return nextSearchParams;
+    });
   };
 
   if (operations.isError) {
@@ -109,30 +139,29 @@ export function OperationsView() {
               Импортировать CSV
             </Button>
           </div>
-        <Table<Operation>
-          rowKey="id"
-          columns={columns}
-          dataSource={items}
-          // isFetching сохраняет спиннер и при переходе между уже закешированными страницами.
-          loading={operations.isFetching}
-          pagination={{
-            current: page,
-            pageSize,
-            total: operations.data?.total ?? 0,
-            showSizeChanger: true,
-            pageSizeOptions: [10, 25, 50, 100],
-            showTotal: (total) => `Всего операций: ${total}`,
-            onChange: handlePageChange,
-          }}
-          scroll={{ x: false }}
-        />
+          <Table<Operation>
+            rowKey="id"
+            columns={columns}
+            dataSource={items}
+            // isFetching сохраняет спиннер и при переходе между уже закешированными страницами.
+            loading={operations.isFetching}
+            pagination={{
+              current: page,
+              pageSize,
+              total: operations.data?.total ?? 0,
+              showSizeChanger: true,
+              pageSizeOptions,
+              showTotal: (total) => `Всего операций: ${total}`,
+              onChange: handlePageChange,
+            }}
+          />
         </div>
       )}
 
       <ImportOperationsModal
         open={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
-        onImported={() => setPage(1)}
+        onImported={resetToFirstPage}
       />
     </section>
   );
