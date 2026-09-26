@@ -53,7 +53,7 @@ dev-ps:
 dev-clear-operations:
 	./$(DEV_TOOLS_DIR)/clear-operations.sh
 
-.PHONY: prod-up prod-down prod-build prod-logs prod-ps
+.PHONY: prod-up prod-down prod-build prod-reset-db prod-logs prod-ps
 # Запускаем production-стек в фоне после пересборки образов.
 prod-up:
 	$(PROD_COMPOSE) up -d --build
@@ -65,6 +65,12 @@ prod-down:
 # Собираем production-образы; используйте после обновления зависимостей или кода.
 prod-build:
 	$(PROD_COMPOSE) build
+
+# ПОЛНОСТЬЮ удаляем MongoDB volume production-стека и создаём чистую базу заново.
+# Используйте только когда данные не нужны: down -v необратимо удаляет все users и operations.
+prod-reset-db:
+	$(PROD_COMPOSE) down -v
+	$(PROD_COMPOSE) up -d --build
 
 # Открываем поток логов production-стека.
 prod-logs:
