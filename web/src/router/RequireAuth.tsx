@@ -32,7 +32,7 @@ export function RequireAuth() {
   }
 
   if (currentUser.isError) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return <Navigate to="/auth/login" replace state={{ from: location }} />;
   }
 
   return <Outlet />;

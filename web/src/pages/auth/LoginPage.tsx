@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import { authQueryKeys, authService } from "../../api";
 import type { LoginRequest } from "../../api";
 import { queryClient } from "../../config/querryClient";
+import { Link } from "react-router";
 
 type RedirectState = {
   from?: {
@@ -93,6 +94,9 @@ export function LoginPage() {
             Войти
           </Button>
         </Form>
+        <Typography.Paragraph className="text-center mt-2" type="secondary">
+          Нет аккаунта? <Link to="/auth/registration">Зарегистрируйтесь.</Link>
+        </Typography.Paragraph>
       </Card>
     </main>
   );

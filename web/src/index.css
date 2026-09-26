@@ -625,6 +625,14 @@ a {
   padding: 0;
 }
 
+.text-center{
+    text-align: center;
+}
+
+.mt-2{
+    margin-top: 8px;
+}
+
 @media (max-width: 767px) {
   .overview-page { margin-top: 24px; }
 

@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { AppLayout } from "./layouts/AppLayout";
 import { LoginPage } from "./pages/auth/LoginPage";
+import { RegistrationPage } from "./pages/auth/RegistrationPage";
 import { RequireAuth } from "./router/RequireAuth";
 import { routes } from "./router/routes";
 import { OverView } from "./pages/Overview";
@@ -17,7 +18,8 @@ function App() {
           path='/overview'
           element=<OverView />
         />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/login" element={<LoginPage />} />
+        <Route path="/auth/registration" element={<RegistrationPage />} />
 
         <Route element={<RequireAuth />}>
           <Route element={<AppLayout />}>

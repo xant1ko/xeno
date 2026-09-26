@@ -26,7 +26,7 @@ export function AppHeader() {
       await authService.logout();
     } finally {
       queryClient.removeQueries({ queryKey: authQueryKeys.me });
-      navigate("/login", { replace: true });
+      navigate("/auth/login", { replace: true });
     }
   };
 
