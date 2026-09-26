@@ -28,7 +28,7 @@ export function RequireAuth() {
   }, [clearUser, currentUser.isError]);
 
   if (currentUser.isPending) {
-    return <Spin fullscreen tip="Проверяем сессию..." />;
+    return <Spin fullscreen/>;
   }
 
   if (currentUser.isError) {

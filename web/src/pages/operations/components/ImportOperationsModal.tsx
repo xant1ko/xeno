@@ -8,14 +8,17 @@ import { useCsvImportMutation } from "../../../queries/useCsvImportMutation";
 type ImportOperationsModalProps = {
   open: boolean;
   onClose: () => void;
+  // Родитель сбрасывает таблицу на первую страницу, чтобы показать только что импортированные операции.
+  onImported: () => void;
 };
 
 export function ImportOperationsModal({
   open,
   onClose,
+  onImported,
 }: ImportOperationsModalProps) {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const importCsv = useCsvImportMutation();
+  const importCsv = useCsvImportMutation({ onSuccess: onImported });
   const selectedFile = fileList[0]?.originFileObj;
 
   const errorMessage = isAxiosError<{ message?: string }>(importCsv.error)

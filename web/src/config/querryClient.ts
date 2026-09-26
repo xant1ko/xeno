@@ -9,7 +9,6 @@ export const queryClient = new QueryClient({
       refetchOnMount: true, // refetch при mount
       refetchOnWindowFocus: true, // refetch при фокусе окна
       retryOnMount: true, // retry ошибки при следующем mount
-      placeholderData: true, // временные данные до получения настоящих
       select: undefined, // преобразование данных перед выдачей компоненту
     },
   },

@@ -43,8 +43,20 @@ const columns: TableColumnsType<Operation> = [
 ];
 
 export function OperationsView() {
-  const operations = useOperationsQuery({ page: 1, limit: 50 });
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const operations = useOperationsQuery({ page, limit: pageSize });
+
+  const handlePageChange = (nextPage: number, nextPageSize: number) => {
+    // При смене размера страницы начинаем с начала, иначе пользователь может попасть на пустую страницу.
+    if (nextPageSize !== pageSize) {
+      setPageSize(nextPageSize);
+      setPage(1);
+      return;
+    }
+    setPage(nextPage);
+  };
 
   if (operations.isError) {
     return (
@@ -58,7 +70,8 @@ export function OperationsView() {
   }
 
   const items = operations.data?.items ?? [];
-  const hasNoOperations = operations.isSuccess && items.length === 0;
+  // Пустой экран показываем только для действительно пустого списка, а не для ещё не загруженной страницы.
+  const hasNoOperations = operations.isSuccess && (operations.data?.total ?? 0) === 0;
 
   return (
     <section className="operations-view">
@@ -100,9 +113,18 @@ export function OperationsView() {
           rowKey="id"
           columns={columns}
           dataSource={items}
-          loading={operations.isPending}
-          pagination={false}
-          scroll={{ x: true }}
+          // isFetching сохраняет спиннер и при переходе между уже закешированными страницами.
+          loading={operations.isFetching}
+          pagination={{
+            current: page,
+            pageSize,
+            total: operations.data?.total ?? 0,
+            showSizeChanger: true,
+            pageSizeOptions: [10, 25, 50, 100],
+            showTotal: (total) => `Всего операций: ${total}`,
+            onChange: handlePageChange,
+          }}
+          scroll={{ x: false }}
         />
         </div>
       )}
@@ -110,6 +132,7 @@ export function OperationsView() {
       <ImportOperationsModal
         open={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
+        onImported={() => setPage(1)}
       />
     </section>
   );
