@@ -9,7 +9,8 @@ MONGO_SCRIPT=$(DEV_TOOLS_DIR)/mongo.sh
 # Короткие команды для полного Docker-стека. Перед первым запуском скопируйте
 # соответствующий .env.*.example в .env.dev или .env.prod.
 COMPOSE=docker compose
-DEV_COMPOSE=$(COMPOSE) --env-file .env.dev -f compose.yaml -f compose.dev.yaml
+# Отдельный project name изолирует dev-контейнеры и MongoDB volume от production.
+DEV_COMPOSE=$(COMPOSE) -p xeno-dev --env-file .env.dev -f compose.yaml -f compose.dev.yaml
 PROD_COMPOSE=$(COMPOSE) --env-file .env.prod -f compose.yaml -f compose.prod.yaml
 
 # --- Docker Compose ---

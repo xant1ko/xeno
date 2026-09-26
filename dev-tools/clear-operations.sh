@@ -11,6 +11,7 @@ PROJECT_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 ENV_FILE="$PROJECT_DIR/.env.dev"
 COMPOSE_FILE="$PROJECT_DIR/compose.yaml"
 COMPOSE_DEV_FILE="$PROJECT_DIR/compose.dev.yaml"
+DEV_PROJECT="xeno-dev" # Должно совпадать с project name в Makefile, чтобы выбрать dev MongoDB volume.
 
 # Без .env.dev невозможно безопасно определить целевую базу и учётные данные MongoDB.
 if [ ! -f "$ENV_FILE" ]; then
@@ -32,7 +33,7 @@ set +a
 
 # deleteMany({}) удаляет исключительно документы коллекции operations: users, индексы и сама база сохраняются.
 # exec вернёт ошибку, если development MongoDB не запущена, и операция не будет выполнена по неверному адресу.
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" -f "$COMPOSE_DEV_FILE" exec -T mongodb \
+docker compose -p "$DEV_PROJECT" --env-file "$ENV_FILE" -f "$COMPOSE_FILE" -f "$COMPOSE_DEV_FILE" exec -T mongodb \
   mongosh --quiet \
   --username "$MONGO_INITDB_ROOT_USERNAME" \
   --password "$MONGO_INITDB_ROOT_PASSWORD" \

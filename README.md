@@ -8,7 +8,7 @@
 cp .env.dev.example .env.dev
 ```
 
-Запуск development-стека с hot reload API и web:
+Запуск development-стека с hot reload API и web. Dev запускается отдельным Compose-проектом `xeno-dev`, поэтому его MongoDB volume не пересекается с production:
 
 ```bash
 make dev-up
