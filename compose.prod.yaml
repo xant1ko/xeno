@@ -2,4 +2,9 @@
 services:
   web:
     ports:
-      - "${WEB_PORT:-80}:80"
+      - "${WEB_PORT:-8090}:443"
+    volumes:
+      - ${XENO_TLS_CERT:-/home/xant1k/nginx/certs/fullchain.pem}:/etc/nginx/ssl/fullchain.pem:ro
+      - ${XENO_TLS_KEY:-/home/xant1k/nginx/certs/privkey.pem}:/etc/nginx/ssl/privkey.pem:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --no-check-certificate --tries=1 --spider https://127.0.0.1/ || exit 1"]
