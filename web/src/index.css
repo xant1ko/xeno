@@ -65,7 +65,8 @@ a {
 }
 
 .app-shell {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .app-sider {
@@ -135,7 +136,11 @@ a {
 }
 
 .app-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
 }
 
 .app-header {
@@ -184,7 +189,20 @@ a {
 }
 
 .app-content {
+  flex: 1;
+  min-height: 0;
   padding: 32px;
+  overflow: auto;
+}
+
+/* Табличная страница заполняет рабочую область; переполнение прокручивает app-content. */
+.data-grid-page {
+  min-width: 0;
+  min-height: 100%;
+}
+
+.data-grid-page__table {
+  min-width: 0;
 }
 
 .operations-view > .ant-typography {

@@ -44,7 +44,7 @@ const columns: TableColumnsType<Operation> = [
 ];
 
 const defaultPage = 1;
-const defaultPageSize = 50;
+const defaultPageSize = 10;
 const pageSizeOptions = [10, 25, 50, 100];
 
 function readPositiveInteger(value: string | null, fallback: number): number {
@@ -104,7 +104,7 @@ export function OperationsView() {
   const hasNoOperations = operations.isSuccess && (operations.data?.total ?? 0) === 0;
 
   return (
-    <section className="operations-view">
+    <section className="operations-view data-grid-page">
       {hasNoOperations ? (
         <div className="operations-empty">
           <div className="operations-empty__icon " aria-hidden="true">
@@ -128,7 +128,7 @@ export function OperationsView() {
           </Button>
         </div>
       ) : (
-        <div>
+        <div className="operations-view__table data-grid-page__table">
           <div className="operations-view__toolbar">
             <Typography.Title level={1}>Операции</Typography.Title>
             <Button
@@ -154,6 +154,7 @@ export function OperationsView() {
               showTotal: (total) => `Всего операций: ${total}`,
               onChange: handlePageChange,
             }}
+            scroll={{ x: true }}
           />
         </div>
       )}
