@@ -16,7 +16,7 @@ make dev-up
 
 После запуска доступны:
 
-- Web: `http://localhost:3000`
+- Web: `http://localhost:8090`
 - API: `http://localhost:8000/api/v1`
 - Swagger: `http://localhost:8000/api/v1/docs`
 - MongoDB: `mongodb://localhost:27017`
