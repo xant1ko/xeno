@@ -1,6 +1,7 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { Collection, Db, ObjectId } from 'mongodb';
+import { Collection, Db, Filter, ObjectId } from 'mongodb';
 import { MONGO_DB } from '../database/database.constants';
+import { OperationType } from './dto/operations-query.dto';
 import { OperationDocument, OperationFields, OperationsPage } from './types/operation.type';
 
 @Injectable()
@@ -53,15 +54,25 @@ export class OperationsRepository implements OnModuleInit {
     return latest?.date ?? null;
   }
 
-  async findAll(userId: ObjectId, page: number, limit: number): Promise<OperationsPage> {
+  async findAll(userId: ObjectId, page: number, limit: number, type?: OperationType): Promise<OperationsPage> {
+    const filter: Filter<OperationDocument> = { user_id: userId };
+
+    // Направление определяется знаком суммы: ноль не относится ни к доходам, ни к расходам.
+    if (type === OperationType.INCOME) {
+      filter.transaction_amount = { $gt: 0 };
+    } else if (type === OperationType.EXPENSE) {
+      filter.transaction_amount = { $lt: 0 };
+    }
+
     const [items, total] = await Promise.all([
       this.collection
-        .find({ user_id: userId })
+        .find(filter)
         .sort({ date: -1, _id: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .toArray(),
-      this.collection.countDocuments({ user_id: userId }),
+      // Считаем по тому же условию, что и записи на странице, иначе сломается пагинация.
+      this.collection.countDocuments(filter),
     ]);
     return { items, total };
   }

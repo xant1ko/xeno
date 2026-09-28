@@ -1,6 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+
+export enum OperationType {
+  INCOME = 'income',
+  EXPENSE = 'expense',
+}
 
 export class OperationsQueryDto {
   @ApiPropertyOptional({ type: Number, default: 1, minimum: 1 })
@@ -17,4 +22,12 @@ export class OperationsQueryDto {
   @Min(1)
   @Max(500)
   limit: number = 50;
+
+  @ApiPropertyOptional({
+    enum: OperationType,
+    description: 'Направление операции: доход — положительная сумма, расход — отрицательная.',
+  })
+  @IsOptional()
+  @IsEnum(OperationType)
+  type?: OperationType;
 }

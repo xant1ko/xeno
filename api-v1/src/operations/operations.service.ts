@@ -38,7 +38,7 @@ export class OperationsService {
   }
 
   async findAll(user: AuthenticatedUser, query: OperationsQueryDto): Promise<OperationsPageResponseDto> {
-    const result = await this.operationsRepository.findAll(this.toUserId(user), query.page, query.limit);
+    const result = await this.operationsRepository.findAll(this.toUserId(user), query.page, query.limit, query.type);
     return {
       items: result.items.map(operation => this.toResponse(operation)),
       total: result.total,

@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { AuthenticatedUser } from '../auth/types/auth.type';
 import { CreateOperationDto } from './dto/create-operation.dto';
+import { OperationType } from './dto/operations-query.dto';
 import { OperationsRepository } from './operations.repository';
 import { OperationsService } from './operations.service';
 import { OperationDocument, OperationFields } from './types/operation.type';
@@ -141,6 +142,24 @@ describe('OperationsService', () => {
       expect(secondResult.created).toBe(1);
       expect(repository.findLatestDate).toHaveBeenNthCalledWith(1, new ObjectId(user.id));
       expect(repository.findLatestDate).toHaveBeenNthCalledWith(2, new ObjectId(anotherUser.id));
+    });
+  });
+
+  describe('findAll', () => {
+    it('passes the income filter through to the repository', async () => {
+      repository.findAll.mockResolvedValue({ items: [], total: 0 });
+
+      await service.findAll(user, { page: 2, limit: 25, type: OperationType.INCOME });
+
+      expect(repository.findAll).toHaveBeenCalledWith(new ObjectId(user.id), 2, 25, OperationType.INCOME);
+    });
+
+    it('does not apply a direction filter when it was not requested', async () => {
+      repository.findAll.mockResolvedValue({ items: [], total: 0 });
+
+      await service.findAll(user, { page: 1, limit: 50 });
+
+      expect(repository.findAll).toHaveBeenCalledWith(new ObjectId(user.id), 1, 50, undefined);
     });
   });
 });
