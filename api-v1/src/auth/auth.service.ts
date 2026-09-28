@@ -6,27 +6,27 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthResult, JwtPayload } from './types/auth.type';
 
-@Injectable() // Регистрируем бизнес-логику регистрации, входа и выпуска токенов.
+@Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<AuthResult> { // Создаём пользователя и выпускаем токен только для установки в cookie.
+  async register(dto: RegisterDto): Promise<AuthResult> {
     const user = await this.usersService.create(dto.login, dto.password);
     return this.createAuthResponse(user);
   }
 
-  async login(dto: LoginDto): Promise<AuthResult> { // Проверяем учётные данные и выпускаем новый токен только для cookie.
+  async login(dto: LoginDto): Promise<AuthResult> {
     const user = await this.usersService.findByNormalizedLogin(dto.login);
     if (!user || !(await argon2.verify(user.password_hash, dto.password))) {
-      throw new UnauthorizedException('Неверный логин или пароль'); // Не раскрываем, существует ли указанный логин.
+      throw new UnauthorizedException('Неверный логин или пароль');
     }
     return this.createAuthResponse(this.usersService.toPublic(user));
   }
 
-  private createAuthResponse(user: ReturnType<UsersService['toPublic']>): AuthResult { // Формируем внутренний результат регистрации и входа.
+  private createAuthResponse(user: ReturnType<UsersService['toPublic']>): AuthResult {
     const payload: JwtPayload = { sub: user.id, login: user.login };
     return {
       access_token: this.jwtService.sign(payload),

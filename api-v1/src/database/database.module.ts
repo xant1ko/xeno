@@ -1,16 +1,16 @@
-import { Global, Module } from '@nestjs/common'; // Импортируем декораторы глобального модуля.
-import { ConfigModule } from '@nestjs/config'; // Даём клиенту доступ к env-конфигурации.
-import { MONGO_CLIENT, MONGO_DB } from './database.constants'; // Подключаем DI-токены MongoDB.
-import { MongoClientService } from './mongo.client'; // Подключаем сервис единого клиента.
+import { Global, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { MONGO_CLIENT, MONGO_DB } from './database.constants';
+import { MongoClientService } from './mongo.client';
 
-@Global() // Делаем базу доступной всем модулям без повторного импорта.
+@Global()
 @Module({
-  imports: [ConfigModule], // Используем глобальную конфигурацию приложения.
+  imports: [ConfigModule],
   providers: [
-    MongoClientService, // Регистрируем lifecycle-управление соединением.
-    { provide: MONGO_CLIENT, useFactory: (service: MongoClientService) => service.getClient(), inject: [MongoClientService] }, // Экспортируем единый MongoClient.
-    { provide: MONGO_DB, useFactory: (service: MongoClientService) => service.getDatabase(), inject: [MongoClientService] }, // Экспортируем рабочую базу.
+    MongoClientService,
+    { provide: MONGO_CLIENT, useFactory: (service: MongoClientService) => service.getClient(), inject: [MongoClientService] },
+    { provide: MONGO_DB, useFactory: (service: MongoClientService) => service.getDatabase(), inject: [MongoClientService] },
   ],
-  exports: [MongoClientService, MONGO_CLIENT, MONGO_DB], // Разрешаем repositories получать клиент или базу.
+  exports: [MongoClientService, MONGO_CLIENT, MONGO_DB],
 })
-export class DatabaseModule {} // Объявляем модуль подключения MongoDB.
+export class DatabaseModule {}

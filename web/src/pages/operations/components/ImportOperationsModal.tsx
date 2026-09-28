@@ -8,7 +8,6 @@ import { useCsvImportMutation } from "../../../queries/useCsvImportMutation";
 type ImportOperationsModalProps = {
   open: boolean;
   onClose: () => void;
-  // Родитель сбрасывает таблицу на первую страницу, чтобы показать только что импортированные операции.
   onImported: () => void;
 };
 

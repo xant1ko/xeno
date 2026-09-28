@@ -4,8 +4,6 @@ import { Navigation } from "./AppNavigationList"
 import { Drawer, Layout } from "antd"
 
 const { Sider } = Layout;
-
-// Состояния навигации приходят из App и используются в desktop- и mobile-вариантах.
 type AppDrawerProps = {
   isMobile?: boolean;
   collapsed?: boolean;

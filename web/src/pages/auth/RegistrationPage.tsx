@@ -19,9 +19,6 @@ type RedirectState = {
 type RegistrationFormValues = LoginRequest & {
   passwordConfirmation: string;
 };
-
-// Регистрация повторяет поведение входа: сервер установит httpOnly-cookie,
-// а клиент сохранит только публичную модель пользователя в Zustand/React Query.
 export function RegistrationPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,8 +27,6 @@ export function RegistrationPage() {
     mutationFn: authService.register,
     onSuccess: (auth) => {
       queryClient.setQueryData(authQueryKeys.me, auth.user);
-
-      // Если пользователя отправили на регистрацию из закрытого раздела, возвращаем его туда.
       const from = (location.state as RedirectState | null)?.from;
       const destination = from
         ? `${from.pathname}${from.search}${from.hash}`

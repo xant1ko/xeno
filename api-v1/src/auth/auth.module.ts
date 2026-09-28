@@ -18,8 +18,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('JWT_SECRET'), // Не храним JWT-секрет в исходном коде.
-        signOptions: { expiresIn: configService.getOrThrow<string>('JWT_EXPIRES_IN') as StringValue }, // Управляем сроком жизни токена из env.
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
+        signOptions: { expiresIn: configService.getOrThrow<string>('JWT_EXPIRES_IN') as StringValue },
       }),
     }),
   ],

@@ -19,10 +19,10 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { AuthenticatedUser, AuthResult } from './types/auth.type';
 
-const accessTokenCookieName = 'xeno_access_token'; // Имя cookie одинаково в Set-Cookie, JwtStrategy и Swagger.
-const accessTokenCookiePath = '/api/v1'; // Cookie отправляется только API-маршрутам, а не всем путям домена.
+const accessTokenCookieName = 'xeno_access_token';
+const accessTokenCookiePath = '/api/v1';
 
-@ApiTags('auth') // Группируем ручки аутентификации в Swagger.
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -37,7 +37,7 @@ export class AuthController {
   @ApiConflictResponse({ description: 'Логин уже занят.' })
   async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) response: Response): Promise<AuthResponseDto> {
     const result = await this.authService.register(dto);
-    this.setAccessTokenCookie(response, result); // Записываем JWT в заголовок, недоступный JavaScript.
+    this.setAccessTokenCookie(response, result);
     return { user: result.user };
   }
 
@@ -48,7 +48,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Неверный логин или пароль.' })
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) response: Response): Promise<AuthResponseDto> {
     const result = await this.authService.login(dto);
-    this.setAccessTokenCookie(response, result); // Каждый успешный вход заменяет прежний JWT новой cookie.
+    this.setAccessTokenCookie(response, result);
     return { user: result.user };
   }
 
@@ -59,7 +59,6 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Cookie JWT отсутствует, повреждён или просрочен.' })
   @UseGuards(JwtAuthGuard)
   logout(@Res({ passthrough: true }) response: Response): void {
-    // Для удаления браузер должен получить те же name/path/secure/sameSite, что у исходной cookie.
     response.clearCookie(accessTokenCookieName, this.getCookieClearOptions());
   }
 
@@ -78,21 +77,19 @@ export class AuthController {
   }
 
   private getCookieOptions(): { httpOnly: true; secure: boolean; sameSite: 'lax'; maxAge: number; path: string } {
-    // Environment-переменные всегда строки, поэтому явно преобразуем значение перед передачей Express.
     const configuredMaxAge = this.configService.get<string | number>('JWT_COOKIE_MAX_AGE_MS', 86_400_000);
     const maxAge = Number(configuredMaxAge);
     return {
-      httpOnly: true, // Браузер отправляет cookie сам, но document.cookie и XSS не прочитают JWT.
-      secure: this.configService.get<string>('JWT_COOKIE_SECURE', 'false') === 'true', // HTTPS-only в production, HTTP допускается для localhost development.
-      sameSite: 'lax', // Защищает от большинства CSRF-навигаций, не мешая same-origin Vite/Nginx-прокси.
-      maxAge: Number.isFinite(maxAge) && maxAge > 0 ? maxAge : 86_400_000, // Неверное env-значение не создаёт вечную или мгновенно истёкшую cookie.
+      httpOnly: true,
+      secure: this.configService.get<string>('JWT_COOKIE_SECURE', 'false') === 'true',
+      sameSite: 'lax',
+      maxAge: Number.isFinite(maxAge) && maxAge > 0 ? maxAge : 86_400_000,
       path: accessTokenCookiePath,
     };
   }
 
   private getCookieClearOptions(): { httpOnly: true; secure: boolean; sameSite: 'lax'; path: string } {
     const { maxAge: _maxAge, ...clearOptions } = this.getCookieOptions();
-    // Не передаём maxAge: Express сам выставляет истёкшую дату для удаления cookie.
     return clearOptions;
   }
 }

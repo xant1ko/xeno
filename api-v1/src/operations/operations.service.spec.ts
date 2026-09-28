@@ -121,7 +121,6 @@ describe('OperationsService', () => {
     });
 
     it('uses a separate latest-date boundary for every user', async () => {
-      // У первого пользователя уже есть операция позднее, у второго коллекция остаётся пустой.
       const anotherUser: AuthenticatedUser = {
         ...user,
         id: '66e4fa78469290f19f5642b2',
@@ -138,8 +137,8 @@ describe('OperationsService', () => {
         operations: [operationDto('2026-09-12T12:00:00.000Z')],
       });
 
-      expect(firstResult.created).toBe(0); // Старая операция первого пользователя пропускается.
-      expect(secondResult.created).toBe(1); // Та же дата для второго пользователя является новой.
+      expect(firstResult.created).toBe(0);
+      expect(secondResult.created).toBe(1);
       expect(repository.findLatestDate).toHaveBeenNthCalledWith(1, new ObjectId(user.id));
       expect(repository.findLatestDate).toHaveBeenNthCalledWith(2, new ObjectId(anotherUser.id));
     });

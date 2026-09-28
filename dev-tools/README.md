@@ -6,7 +6,6 @@
 
 ```sh
 cp dev-tools/.env.example dev-tools/.env
-# Отредактируйте dev-tools/.env и задайте пароль.
 ./dev-tools/mongo.sh up
 ```
 

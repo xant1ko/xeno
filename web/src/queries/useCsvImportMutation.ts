@@ -12,7 +12,6 @@ export function useCsvImportMutation(options: UseCsvImportMutationOptions = {}) 
   return useMutation({
     mutationFn: csvImportService.importFile,
     onSuccess: () => {
-      // Обновляем данные всех сохранённых страниц: импорт изменил total и первую страницу списка.
       void queryClient.invalidateQueries({ queryKey: operationsQueryKeys.all });
       options.onSuccess?.();
     },

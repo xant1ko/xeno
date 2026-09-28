@@ -1,8 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common'; // Импортируем HTTP-ошибку и DI-декоратор.
-import { parse } from 'csv-parse/sync'; // Используем синхронный parser для загруженного буфера.
-import { CsvImportError, CsvImportResult, CsvRow, TransactionImportRow } from './types/csv-row.type'; // Подключаем типы импорта.
-
-// Описываем обязательные заголовки банковского CSV.
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { parse } from 'csv-parse/sync';
+import { CsvImportError, CsvImportResult, CsvRow, TransactionImportRow } from './types/csv-row.type';
 const requiredColumns = [
   'Имя счёта',
   'Номер карты',
@@ -15,116 +13,114 @@ const requiredColumns = [
   'Описание',
   'Сообщение',
 ] as const;
-
-// Позволяем передавать ошибку преобразования с конкретным полем.
 class CsvRowError extends Error {
   constructor(
     public readonly field: string,
     public readonly value: string,
     message: string,
   ) {
-    super(message); // Передаём описание базовому классу Error.
+    super(message);
   }
 }
 
-@Injectable() // Регистрируем сервис в контейнере NestJS.
+@Injectable()
 export class CsvImportService {
-  parseFile(file: Express.Multer.File): CsvImportResult { // Преобразуем CSV в успешные строки и ошибки.
-    if (!file.originalname.toLowerCase().endsWith('.csv')) { // Проверяем расширение загруженного файла.
-      throw new BadRequestException('Ожидается файл с расширением .csv'); // Отклоняем неподдерживаемый формат.
+  parseFile(file: Express.Multer.File): CsvImportResult {
+    if (!file.originalname.toLowerCase().endsWith('.csv')) {
+      throw new BadRequestException('Ожидается файл с расширением .csv');
     }
-    if (!file.buffer.length) { // Проверяем, что файл не пустой.
-      throw new BadRequestException('CSV-файл пустой'); // Возвращаем понятную ошибку клиенту.
+    if (!file.buffer.length) {
+      throw new BadRequestException('CSV-файл пустой');
     }
 
-    let records: CsvRow[]; // Подготавливаем массив сырых строк.
+    let records: CsvRow[];
     try {
-      records = parse(file.buffer.toString('utf8'), { // Декодируем файл и запускаем parser.
-        bom: true, // Убираем UTF-8 BOM, если он присутствует.
-        columns: true, // Используем первую строку как имена полей.
-        delimiter: ';', // Используем точку с запятой как разделитель.
-        skip_empty_lines: true, // Не создаём записи из пустых строк.
-        trim: true, // Убираем пробелы вокруг значений.
-      }) as CsvRow[]; // Приводим результат parser-а к типу сырых строк.
+      records = parse(file.buffer.toString('utf8'), {
+        bom: true,
+        columns: true,
+        delimiter: ';',
+        skip_empty_lines: true,
+        trim: true,
+      }) as CsvRow[];
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'неизвестная ошибка'; // Получаем безопасное описание parser-ошибки.
-      throw new BadRequestException(`Некорректный CSV-файл: ${message}`); // Ошибка структуры файла остаётся общей для всего файла.
+      const message = error instanceof Error ? error.message : 'неизвестная ошибка';
+      throw new BadRequestException(`Некорректный CSV-файл: ${message}`);
     }
 
-    const headers = records.length > 0 ? Object.keys(records[0]) : []; // Получаем заголовки из первой записи.
-    const missingColumn = requiredColumns.find(column => !headers.includes(column)); // Ищем отсутствующий обязательный заголовок.
-    if (missingColumn) { // Проверяем результат поиска заголовка.
-      throw new BadRequestException(`В CSV отсутствует обязательная колонка: ${missingColumn}`); // Без заголовка строки нельзя преобразовать.
+    const headers = records.length > 0 ? Object.keys(records[0]) : [];
+    const missingColumn = requiredColumns.find(column => !headers.includes(column));
+    if (missingColumn) {
+      throw new BadRequestException(`В CSV отсутствует обязательная колонка: ${missingColumn}`);
     }
 
-    const rows: TransactionImportRow[] = []; // Собираем успешно преобразованные строки.
-    const errors: CsvImportError[] = []; // Собираем ошибки и продолжаем обработку файла.
-    records.forEach((record, index) => { // Обрабатываем каждую строку независимо.
-      const rowNumber = index + 2; // Учитываем строку заголовков при нумерации.
+    const rows: TransactionImportRow[] = [];
+    const errors: CsvImportError[] = [];
+    records.forEach((record, index) => {
+      const rowNumber = index + 2;
       try {
-        rows.push(this.transformRow(record)); // Добавляем только валидную преобразованную строку.
+        rows.push(this.transformRow(record));
       } catch (error) {
-        errors.push(this.toImportError(error, rowNumber)); // Сохраняем ошибку и не прерываем импорт.
+        errors.push(this.toImportError(error, rowNumber));
       }
     });
 
-    return { rows, errors }; // Возвращаем частичный результат обработки.
+    return { rows, errors };
   }
 
-  private transformRow(row: CsvRow): TransactionImportRow { // Преобразуем одну банковскую строку.
+  private transformRow(row: CsvRow): TransactionImportRow {
     return {
-      account_name: this.requiredString(row['Имя счёта'], 'Имя счёта'), // Переименовываем имя счёта.
-      card_number: this.normalizeString(row['Номер карты']), // Сохраняем номер карты и допускаем пустое значение.
-      date: this.parseDate(row['Дата операции'], 'Дата операции'), // Преобразуем дату в Date.
-      transaction_amount: this.parseAmount(row['Сумма операции'], 'Сумма операции'), // Преобразуем сумму с запятой.
-      currency: this.requiredString(row['Валюта операции'], 'Валюта операции').toUpperCase(), // Нормализуем валюту.
-      status: this.requiredString(row['Статус'], 'Статус'), // Переносим статус операции.
-      default_category: this.requiredString(row['Категория по-умолчанию'], 'Категория по-умолчанию'), // Переносим категорию банка.
-      custom_category: this.normalizeString(row['Ваша категория']), // Пустую категорию оставляем пустой строкой.
-      description: this.normalizeString(row['Описание']), // Переносим описание операции.
-      message: this.normalizeString(row['Сообщение']), // Переносим сообщение операции.
-    }; // Возвращаем целевую модель операции.
+      account_name: this.requiredString(row['Имя счёта'], 'Имя счёта'),
+      card_number: this.normalizeString(row['Номер карты']),
+      date: this.parseDate(row['Дата операции'], 'Дата операции'),
+      transaction_amount: this.parseAmount(row['Сумма операции'], 'Сумма операции'),
+      currency: this.requiredString(row['Валюта операции'], 'Валюта операции').toUpperCase(),
+      status: this.requiredString(row['Статус'], 'Статус'),
+      default_category: this.requiredString(row['Категория по-умолчанию'], 'Категория по-умолчанию'),
+      custom_category: this.normalizeString(row['Ваша категория']),
+      description: this.normalizeString(row['Описание']),
+      message: this.normalizeString(row['Сообщение']),
+    };
   }
 
-  private requiredString(value: string | undefined, field: string): string { // Проверяем обязательное текстовое поле.
-    const normalized = this.normalizeString(value); // Нормализуем входное значение.
-    if (!normalized) { // Проверяем, что поле заполнено.
-      throw new CsvRowError(field, normalized, 'Поле обязательно для заполнения'); // Формируем ошибку конкретной строки.
+  private requiredString(value: string | undefined, field: string): string {
+    const normalized = this.normalizeString(value);
+    if (!normalized) {
+      throw new CsvRowError(field, normalized, 'Поле обязательно для заполнения');
     }
-    return normalized; // Возвращаем очищенную строку.
+    return normalized;
   }
 
-  private normalizeString(value: string | undefined): string { // Унифицируем обработку строковых значений.
-    return value?.trim() ?? ''; // Убираем пробелы и заменяем отсутствие значения на пустую строку.
+  private normalizeString(value: string | undefined): string {
+    return value?.trim() ?? '';
   }
 
-  private parseAmount(value: string | undefined, field: string): number { // Преобразуем сумму с русским десятичным разделителем.
-    const normalized = this.normalizeString(value).replace(',', '.'); // Заменяем десятичную запятую на точку.
-    const amount = Number(normalized); // Преобразуем строку в число.
-    if (!normalized || !Number.isFinite(amount)) { // Проверяем корректность результата.
-      throw new CsvRowError(field, normalized, 'Значение не является числом'); // Возвращаем ошибку с исходным значением.
+  private parseAmount(value: string | undefined, field: string): number {
+    const normalized = this.normalizeString(value).replace(',', '.');
+    const amount = Number(normalized);
+    if (!normalized || !Number.isFinite(amount)) {
+      throw new CsvRowError(field, normalized, 'Значение не является числом');
     }
-    return amount; // Возвращаем числовую сумму.
+    return amount;
   }
 
-  private parseDate(value: string | undefined, field: string): Date { // Преобразуем дату DD.MM.YYYY HH:mm:ss.
-    const normalized = this.normalizeString(value); // Убираем лишние пробелы вокруг даты.
-    const match = /^(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2}):(\d{2})$/.exec(normalized); // Проверяем строгий формат даты.
-    if (!match) { // Обрабатываем неверный формат даты.
-      throw new CsvRowError(field, normalized, 'Ожидается формат DD.MM.YYYY HH:mm:ss'); // Возвращаем понятную ошибку.
+  private parseDate(value: string | undefined, field: string): Date {
+    const normalized = this.normalizeString(value);
+    const match = /^(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2}):(\d{2})$/.exec(normalized);
+    if (!match) {
+      throw new CsvRowError(field, normalized, 'Ожидается формат DD.MM.YYYY HH:mm:ss');
     }
-    const [, day, month, year, hours, minutes, seconds] = match; // Извлекаем компоненты даты.
-    const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes), Number(seconds)); // Создаём локальную дату.
-    if (date.getFullYear() !== Number(year) || date.getMonth() !== Number(month) - 1 || date.getDate() !== Number(day)) { // Проверяем существование даты.
-      throw new CsvRowError(field, normalized, 'Дата не существует'); // Отклоняем, например, 31.02.2026.
+    const [, day, month, year, hours, minutes, seconds] = match;
+    const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes), Number(seconds));
+    if (date.getFullYear() !== Number(year) || date.getMonth() !== Number(month) - 1 || date.getDate() !== Number(day)) {
+      throw new CsvRowError(field, normalized, 'Дата не существует');
     }
-    return date; // Возвращаем валидную дату.
+    return date;
   }
 
-  private toImportError(error: unknown, row: number): CsvImportError { // Преобразуем исключение в JSON-ошибку строки.
-    if (error instanceof CsvRowError) { // Проверяем нашу структурированную ошибку.
-      return { row, field: error.field, value: error.value, message: error.message }; // Возвращаем поле и значение.
+  private toImportError(error: unknown, row: number): CsvImportError {
+    if (error instanceof CsvRowError) {
+      return { row, field: error.field, value: error.value, message: error.message };
     }
-    return { row, message: error instanceof Error ? error.message : 'Ошибка преобразования строки' }; // Обрабатываем неожиданные ошибки безопасно.
+    return { row, message: error instanceof Error ? error.message : 'Ошибка преобразования строки' };
   }
 }

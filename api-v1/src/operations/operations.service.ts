@@ -96,7 +96,7 @@ export class OperationsService {
     return new ObjectId(id);
   }
 
-  private toUserId(user: AuthenticatedUser): ObjectId { // Преобразуем проверенный JWT-пользователь в MongoDB ObjectId.
+  private toUserId(user: AuthenticatedUser): ObjectId {
     return new ObjectId(user.id);
   }
 

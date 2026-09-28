@@ -49,8 +49,6 @@ const pageSizeOptions = [10, 25, 50, 100];
 
 function readPositiveInteger(value: string | null, fallback: number): number {
   const parsedValue = Number(value);
-
-  // Некорректный URL не должен ломать таблицу: используем безопасное значение по умолчанию.
   return Number.isInteger(parsedValue) && parsedValue > 0
     ? parsedValue
     : fallback;
@@ -68,11 +66,8 @@ export function OperationsView() {
 
   const handlePageChange = (nextPage: number, nextPageSize: number) => {
     setSearchParams((currentSearchParams) => {
-      // Клонируем текущие параметры, чтобы будущие фильтры не пропадали при смене страницы.
       const nextSearchParams = new URLSearchParams(currentSearchParams);
       const isPageSizeChanged = nextPageSize !== pageSize;
-
-      // При смене размера страницы начинаем с начала, иначе пользователь может попасть на пустую страницу.
       nextSearchParams.set("page", String(isPageSizeChanged ? defaultPage : nextPage));
       nextSearchParams.set("limit", String(nextPageSize));
 
@@ -100,7 +95,6 @@ export function OperationsView() {
   }
 
   const items = operations.data?.items ?? [];
-  // Пустой экран показываем только для действительно пустого списка, а не для ещё не загруженной страницы.
   const hasNoOperations = operations.isSuccess && (operations.data?.total ?? 0) === 0;
 
   return (
@@ -143,7 +137,6 @@ export function OperationsView() {
             rowKey="id"
             columns={columns}
             dataSource={items}
-            // isFetching сохраняет спиннер и при переходе между уже закешированными страницами.
             loading={operations.isFetching}
             pagination={{
               current: page,

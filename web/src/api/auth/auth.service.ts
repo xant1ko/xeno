@@ -20,7 +20,6 @@ export const authService = {
 
   async register(credentials: LoginRequest): Promise<AuthResponse> {
     const response = await apiClient.post<AuthResponse>(
-      // Регистрация API устанавливает httpOnly-cookie так же, как вход.
       "/auth/register",
       credentials,
     );

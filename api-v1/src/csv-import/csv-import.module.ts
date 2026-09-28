@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common'; // Импортируем декоратор NestJS-модуля.
+import { Module } from '@nestjs/common';
 import { OperationsModule } from '../operations/operations.module';
-import { CsvImportController } from './csv-import.controller'; // Подключаем HTTP-контроллер импорта.
-import { CsvImportService } from './csv-import.service'; // Подключаем сервис парсинга CSV.
+import { CsvImportController } from './csv-import.controller';
+import { CsvImportService } from './csv-import.service';
 
 @Module({
   imports: [OperationsModule],
-  controllers: [CsvImportController], // Регистрируем endpoint загрузки файла.
-  providers: [CsvImportService], // Регистрируем сервис обработки CSV.
+  controllers: [CsvImportController],
+  providers: [CsvImportService],
 })
-export class CsvImportModule {} // Объявляем модуль импорта CSV.
+export class CsvImportModule {}

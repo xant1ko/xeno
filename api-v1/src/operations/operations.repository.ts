@@ -15,7 +15,7 @@ export class OperationsRepository implements OnModuleInit {
     await this.collection.createIndex(
       { user_id: 1, date: -1 },
       { name: 'operations_user_id_date_desc' },
-    ); // Используем владельца и дату для изолированного импорта и списка операций.
+    );
   }
 
   async create(userId: ObjectId, fields: OperationFields): Promise<OperationDocument> {

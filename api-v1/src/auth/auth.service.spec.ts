@@ -5,8 +5,6 @@ import { ObjectId } from 'mongodb';
 import { UserDocument, UserPublic } from '../users/types/user.type';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
-
-// Заменяем нативный Argon2 моками, чтобы тестировать auth-сервис без зависимости от бинарного addon.
 jest.mock('argon2', () => ({
   argon2id: 2,
   hash: jest.fn(),
@@ -29,7 +27,6 @@ describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(() => {
-    // Настраиваем моки так, чтобы тестировать auth-логику отдельно от MongoDB и JWT-криптографии.
     usersService = {
       create: jest.fn(),
       findByNormalizedLogin: jest.fn(),
@@ -40,11 +37,10 @@ describe('AuthService', () => {
       usersService as unknown as UsersService,
       jwtService as unknown as JwtService,
     );
-    jest.mocked(argon2.verify).mockResolvedValue(true); // По умолчанию пароль считается корректным.
+    jest.mocked(argon2.verify).mockResolvedValue(true);
   });
 
   it('registers a user and returns an access token', async () => {
-    // После регистрации UsersService отдаёт только безопасные публичные поля.
     const user: UserPublic = {
       id: '66e4fa78469290f19f5642b1',
       login: 'alex',
@@ -61,7 +57,6 @@ describe('AuthService', () => {
   });
 
   it('logs in a user when the password matches the Argon2 hash', async () => {
-    // Имитируем документ MongoDB, где находится хеш, недоступный публичному API.
     const passwordHash = '$argon2id$mock-password-hash';
     const document: UserDocument = {
       _id: new ObjectId('66e4fa78469290f19f5642b1'),
@@ -87,12 +82,9 @@ describe('AuthService', () => {
   });
 
   it('returns the same unauthorized error for an unknown login and an incorrect password', async () => {
-    // Скрываем существование логина от потенциального перебора учётных записей.
     usersService.findByNormalizedLogin.mockResolvedValue(null);
     await expect(service.login({ login: 'missing', password: 'secure-password' })).rejects.toBeInstanceOf(UnauthorizedException);
-
-    // Повторяем проверку для существующего пользователя, но с неверным паролем.
-    jest.mocked(argon2.verify).mockResolvedValue(false); // Имитируем несовпадение пароля без вызова нативной библиотеки.
+    jest.mocked(argon2.verify).mockResolvedValue(false);
     usersService.findByNormalizedLogin.mockResolvedValue({
       _id: new ObjectId(),
       login: 'alex',
@@ -106,7 +98,6 @@ describe('AuthService', () => {
   });
 
   it('keeps the conflict error from user creation during registration', async () => {
-    // Ошибка занятого логина — ожидаемый конфликт, её нельзя заменять на 500.
     usersService.create.mockRejectedValue(new ConflictException('Логин уже занят'));
 
     await expect(service.register({ login: 'alex', password: 'secure-password' })).rejects.toBeInstanceOf(ConflictException);

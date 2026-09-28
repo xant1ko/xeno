@@ -1,4 +1,3 @@
-# Production-override: наружу доступен только Nginx с web-приложением.
 services:
   web:
     ports:

@@ -1,24 +1,15 @@
-# Описываем локальный MongoDB-сервис для разработки.
 services:
-  # Запускаем базовый экземпляр MongoDB.
   mongodb:
-    # Используем стабильную ветку MongoDB 7, совместимую с текущим kernel.
     image: mongo:7.0
-    # Даём контейнеру стабильное имя для локальных команд.
     container_name: xeno-mongodb
-    # Передаём учётные данные root из файла окружения.
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:?MONGO_INITDB_ROOT_USERNAME is required}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?MONGO_INITDB_ROOT_PASSWORD is required}
     volumes:
       - mongodb-data:/data/db
-    # Открываем MongoDB на стандартном локальном порту.
     ports:
       - "${MONGO_PORT:-27017}:27017"
-    # Перезапускаем контейнер после сбоя, но не после ручной остановки.
     restart: unless-stopped
-
-# Объявляем именованный volume для данных MongoDB.
 volumes:
   mongodb-data:
     driver: local

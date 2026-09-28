@@ -11,7 +11,6 @@ export function useOperationsQuery(query: OperationsQuery) {
   return useQuery({
     queryKey: operationsQueryKeys.list(query),
     queryFn: () => operationsService.getAll(query),
-    // Пока API загружает следующую страницу, таблица показывает предыдущую без пустого мигания.
     placeholderData: keepPreviousData,
   });
 }
