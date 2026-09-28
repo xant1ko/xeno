@@ -52,6 +52,15 @@ export const theme: ThemeConfig = {
       hoverBorderColor: colors.primaryFocus,
       activeBorderColor: colors.primary,
     },
+    Segmented: {
+      trackBg: colors.backgroundElevated,
+      itemColor: colors.textSecondary,
+      itemHoverColor: colors.textPrimary,
+      itemHoverBg: colors.backgroundHover,
+      itemActiveBg: colors.primaryActive,
+      itemSelectedBg: colors.primary,
+      itemSelectedColor: colors.white,
+    },
     Table: {
       colorBgContainer: colors.surface,
       headerBg: colors.backgroundElevated,

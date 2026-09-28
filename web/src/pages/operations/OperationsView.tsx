@@ -3,9 +3,10 @@ import { Alert, Button, Table, Typography } from "antd";
 import type { TableColumnsType } from "antd";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
-import type { Operation } from "../../types";
+import type { Operation, OperationType } from "../../types";
 import { useOperationsQuery } from "../../queries/useOperationsQuery";
 import { ImportOperationsModal } from "./components/ImportOperationsModal";
+import { OperationTypeFilter } from "./components/OperationTypeFilter";
 
 const columns: TableColumnsType<Operation> = [
   {
@@ -54,6 +55,10 @@ function readPositiveInteger(value: string | null, fallback: number): number {
     : fallback;
 }
 
+function readOperationType(value: string | null): OperationType {
+  return value === "income" || value === "expense" ? value : "all";
+}
+
 export function OperationsView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -62,7 +67,27 @@ export function OperationsView() {
     searchParams.get("limit"),
     defaultPageSize,
   );
-  const operations = useOperationsQuery({ page, limit: pageSize });
+  const operationType = readOperationType(searchParams.get("type"));
+  const operations = useOperationsQuery({
+    page,
+    limit: pageSize,
+    ...(operationType !== "all" && { type: operationType }),
+  });
+
+  const handleOperationTypeChange = (nextType: OperationType) => {
+    setSearchParams((currentSearchParams) => {
+      const nextSearchParams = new URLSearchParams(currentSearchParams);
+      nextSearchParams.set("page", String(defaultPage));
+
+      if (nextType === "all") {
+        nextSearchParams.delete("type");
+      } else {
+        nextSearchParams.set("type", nextType);
+      }
+
+      return nextSearchParams;
+    });
+  };
 
   const handlePageChange = (nextPage: number, nextPageSize: number) => {
     setSearchParams((currentSearchParams) => {
@@ -99,6 +124,23 @@ export function OperationsView() {
 
   return (
     <section className="operations-view data-grid-page">
+      <div className="operations-view__toolbar">
+        <Typography.Title level={1}>Операции</Typography.Title>
+        <div className="operations-view__actions">
+          <OperationTypeFilter
+            value={operationType}
+            onChange={handleOperationTypeChange}
+          />
+          <Button
+            type="primary"
+            icon={<UploadOutlined />}
+            onClick={() => setIsImportModalOpen(true)}
+          >
+            Импортировать CSV
+          </Button>
+        </div>
+      </div>
+
       {hasNoOperations ? (
         <div className="operations-empty">
           <div className="operations-empty__icon " aria-hidden="true">
@@ -106,33 +148,18 @@ export function OperationsView() {
           </div>
 
           <Typography.Title level={2}>
-            Начните работу прямо сейчас
+            {operationType === "all"
+              ? "Начните работу прямо сейчас"
+              : `Нет ${operationType === "income" ? "доходов" : "расходов"}`}
           </Typography.Title>
           <Typography.Paragraph type="secondary">
-            Добавьте первые операции, чтобы увидеть движение денег, категории и
-            историю расходов в одном месте.
+            {operationType === "all"
+              ? "Добавьте первые операции, чтобы увидеть движение денег, категории и историю расходов в одном месте."
+              : "Попробуйте выбрать другой тип операции или импортировать новые данные."}
           </Typography.Paragraph>
-
-          <Button
-            type="primary"
-            size="large"
-            onClick={() => setIsImportModalOpen(true)}
-          >
-            Импортировать CSV
-          </Button>
         </div>
       ) : (
         <div className="operations-view__table data-grid-page__table">
-          <div className="operations-view__toolbar">
-            <Typography.Title level={1}>Операции</Typography.Title>
-            <Button
-              type="primary"
-              icon={<UploadOutlined />}
-              onClick={() => setIsImportModalOpen(true)}
-            >
-              Импортировать CSV
-            </Button>
-          </div>
           <Table<Operation>
             rowKey="id"
             columns={columns}

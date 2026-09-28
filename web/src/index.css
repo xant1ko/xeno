@@ -250,6 +250,12 @@ a {
   margin: 0;
 }
 
+.operations-view__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .operations-empty {
   display: flex;
   align-items: center;
@@ -710,6 +716,11 @@ a {
 
   .operations-view__toolbar .ant-btn {
     align-self: flex-start;
+  }
+
+  .operations-view__actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .operations-empty {

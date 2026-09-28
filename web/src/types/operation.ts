@@ -21,7 +21,10 @@ export type OperationsPage = {
   limit: number;
 };
 
+export type OperationType = "all" | "income" | "expense";
+
 export type OperationsQuery = {
   page?: number;
   limit?: number;
+  type?: Exclude<OperationType, "all">;
 };
