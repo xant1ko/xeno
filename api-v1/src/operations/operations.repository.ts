@@ -77,6 +77,14 @@ export class OperationsRepository implements OnModuleInit {
     return { items, total };
   }
 
+  findAllForCategories(userId: ObjectId): Promise<OperationDocument[]> {
+    // Для пересчёта категорий нужна полная выборка, поэтому здесь намеренно нет пагинации.
+    return this.collection
+      .find({ user_id: userId })
+      .project({ default_category: 1, custom_category: 1 })
+      .toArray() as Promise<OperationDocument[]>;
+  }
+
   findById(userId: ObjectId, id: ObjectId): Promise<OperationDocument | null> {
     return this.collection.findOne({ _id: id, user_id: userId });
   }

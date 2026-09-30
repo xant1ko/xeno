@@ -13,17 +13,20 @@ const columns: TableColumnsType<Operation> = [
     title: "Дата",
     dataIndex: "date",
     key: "date",
+    width: 100,
     render: (date: string) => new Date(date).toLocaleString("ru-RU"),
   },
   {
     title: "Описание",
     dataIndex: "description",
     key: "description",
+    width: 320,
   },
   {
     title: "Категория",
     dataIndex: "custom_category",
     key: "custom_category",
+    width: 200,
     render: (category: string, operation) =>
       category || operation.default_category,
   },
@@ -31,16 +34,12 @@ const columns: TableColumnsType<Operation> = [
     title: "Сумма",
     dataIndex: "transaction_amount",
     key: "transaction_amount",
+    width: 160,
     render: (amount: number, operation) =>
       new Intl.NumberFormat("ru-RU", {
         style: "currency",
         currency: operation.currency,
       }).format(amount),
-  },
-  {
-    title: "Статус",
-    dataIndex: "status",
-    key: "status",
   },
 ];
 
@@ -125,8 +124,6 @@ export function OperationsView() {
   return (
     <section className="operations-view data-grid-page">
       <div className="operations-view__toolbar">
-        <Typography.Title level={1}>Операции</Typography.Title>
-        <div className="operations-view__actions">
           <OperationTypeFilter
             value={operationType}
             onChange={handleOperationTypeChange}
@@ -138,7 +135,6 @@ export function OperationsView() {
           >
             Импортировать CSV
           </Button>
-        </div>
       </div>
 
       {hasNoOperations ? (
