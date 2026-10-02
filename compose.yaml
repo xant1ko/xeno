@@ -1,75 +1,144 @@
 services:
+  # MongoDB: база данных доступна только внутри Docker-сети.
   mongodb:
+    # Используем официальный образ MongoDB.
     image: mongo:7.0
+    # Передаём учётные данные администратора через внешний .env-файл.
     environment:
+      # Имя администратора MongoDB.
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:?MONGO_INITDB_ROOT_USERNAME is required}
+      # Пароль администратора MongoDB.
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?MONGO_INITDB_ROOT_PASSWORD is required}
+    # Сохраняем данные базы после пересоздания контейнера.
     volumes:
+      # Именованный volume монтируется в стандартный каталог данных MongoDB.
       - mongodb-data:/data/db
+    # Подключаем MongoDB к общей внутренней сети проекта.
     networks:
+      # В этой сети API найдёт базу по имени mongodb.
       - xeno
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --username $$MONGO_INITDB_ROOT_USERNAME --password $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand(\"ping\").ok' | grep 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
+    # Не публикуем порт MongoDB наружу.
     restart: unless-stopped
 
+  # API: NestJS-сервис доступен только reverse proxy внутри сети.
   api:
+    # Собираем production-образ из api-v1/Dockerfile.
     build:
+      # Каталог сборочного контекста API.
       context: ./api-v1
+      # Используем production-этап Dockerfile.
       target: production
+    # Передаём настройки приложения через переменные окружения.
     environment:
+      # Включаем production-режим Node/NestJS.
       NODE_ENV: production
+      # Внутренний порт, на котором NestJS слушает HTTP.
       PORT: 8000
+      # Внутренний адрес MongoDB по имени сервиса Docker.
       MONGO_URI: mongodb://mongodb:27017
+      # Имя базы данных приложения.
       MONGO_DATABASE: ${MONGO_DATABASE:?MONGO_DATABASE is required}
+      # Логин MongoDB берём из того же .env, что инициализирует базу.
       MONGO_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:?MONGO_INITDB_ROOT_USERNAME is required}
+      # Пароль MongoDB берём из того же .env, что инициализирует базу.
       MONGO_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?MONGO_INITDB_ROOT_PASSWORD is required}
+      # База, в которой создан пользователь MongoDB.
       MONGO_AUTH_SOURCE: admin
+      # Минимальная длина пользовательского пароля приложения.
       PASSWORD_MIN_LENGTH: ${PASSWORD_MIN_LENGTH:-8}
+      # Максимальная длина пользовательского пароля приложения.
       PASSWORD_MAX_LENGTH: ${PASSWORD_MAX_LENGTH:-128}
+      # Секрет подписи JWT берётся только из внешнего .env.
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      # Срок действия JWT.
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      # В production cookie авторизации должна быть доступна только по HTTPS.
       JWT_COOKIE_SECURE: ${JWT_COOKIE_SECURE:-true}
+      # Время жизни cookie в миллисекундах.
       JWT_COOKIE_MAX_AGE_MS: ${JWT_COOKIE_MAX_AGE_MS:-86400000}
+    # Запускаем API после успешной проверки готовности MongoDB.
     depends_on:
+      # Имя зависимости совпадает с именем сервиса базы.
       mongodb:
-        condition: service_healthy
+        # API запускается после старта контейнера MongoDB.
+        condition: service_started
+    # API виден только внутри общей сети.
     networks:
+      # Reverse proxy обращается к API по имени api.
       - xeno
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:8000/api/v1/health', response => process.exit(response.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
+    # Не публикуем порт API на хост.
     restart: unless-stopped
 
+  # Web: контейнер только раздаёт собранную React-статику по HTTP.
   web:
+    # Собираем production-образ из web/Dockerfile.
     build:
+      # Каталог сборочного контекста frontend.
       context: ./web
+      # Используем production-этап Dockerfile.
       target: production
+      # Передаём Vite адрес API во время сборки frontend.
       args:
+        # Относительный путь сохраняет same-origin через внешний proxy.
         VITE_API_URL: /api/v1
+    # Web запускается после готовности API.
     depends_on:
+      # Имя зависимости совпадает с именем API-сервиса.
       api:
-        condition: service_healthy
+        # Web запускается после старта контейнера API.
+        condition: service_started
+    # Web доступен только reverse proxy внутри сети.
     networks:
+      # Reverse proxy обращается к frontend по имени web.
       - xeno
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
+    # Не публикуем порт frontend на хост.
     restart: unless-stopped
 
+  # Reverse proxy: единственный контейнер, доступный из интернета.
+  nginx-revers:
+    # Собираем образ из каталога nginx-revers.
+    build:
+      # В контексте находятся Dockerfile и nginx.conf reverse proxy.
+      context: ./nginx-revers
+      # Выбираем production-этап Dockerfile.
+      target: production
+    # Публикуем внешний 8090 на HTTPS-порт Nginx внутри контейнера.
+    ports:
+      # Хост:8090 → контейнер:443.
+      - "8090:443"
+    # Подключаем сертификаты только для чтения.
+    volumes:
+      # Публичная цепочка сертификата становится доступной Nginx внутри контейнера.
+      - ${XENO_TLS_CERT:?XENO_TLS_CERT is required}:/etc/nginx/ssl/fullchain.pem:ro
+      # Приватный ключ становится доступным Nginx внутри контейнера только для чтения.
+      - ${XENO_TLS_KEY:?XENO_TLS_KEY is required}:/etc/nginx/ssl/privkey.pem:ro
+    # Reverse proxy запускается после web и API.
+    depends_on:
+      # Дожидаемся запуска frontend-сервиса.
+      web:
+        # Для минимального конфига достаточно факта запуска контейнера.
+        condition: service_started
+      # Дожидаемся запуска API-сервиса.
+      api:
+        # Для минимального конфига достаточно факта запуска контейнера.
+        condition: service_started
+    # Подключаем reverse proxy к той же сети, где находятся web и api.
+    networks:
+      # Благодаря этой сети имена web и api разрешаются Docker DNS.
+      - xeno
+    # Автоматически перезапускаем proxy после сбоя или перезагрузки Docker.
+    restart: unless-stopped
+
+# Общая внутренняя сеть всех четырёх контейнеров.
 networks:
+  # Имя сети внутри Compose-проекта.
   xeno:
+    # Обычная bridge-сеть Docker для контейнеров на одном хосте.
     driver: bridge
 
+# Постоянное хранилище MongoDB.
 volumes:
+  # Имя volume, который монтируется в mongodb:/data/db.
   mongodb-data:
+    # Стандартный локальный драйвер Docker.
     driver: local
